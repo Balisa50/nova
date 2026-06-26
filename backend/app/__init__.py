@@ -1,0 +1,1 @@
+"""SYNTH-FIN FastAPI application."""

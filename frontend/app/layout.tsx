@@ -1,0 +1,70 @@
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import Link from "next/link";
+import "./globals.css";
+
+const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
+const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
+
+export const metadata: Metadata = {
+  title: "SYNTH-FIN — Synthetic financial data for West Africa",
+  description:
+    "A Conditional Tabular GAN, built from scratch, that generates privacy-safe, statistically faithful microfinance data for West African fintech.",
+};
+
+function Nav() {
+  return (
+    <header className="sticky top-0 z-50 backdrop-blur-md bg-bg/80 border-b border-line">
+      <div className="mx-auto max-w-6xl px-6 h-16 flex items-center justify-between">
+        <Link href="/" className="flex items-center gap-2 no-underline">
+          <span className="block w-2.5 h-2.5 bg-accent live-dot" />
+          <span className="font-mono font-semibold tracking-tight text-fg">
+            SYNTH<span className="text-accent">-</span>FIN
+          </span>
+        </Link>
+        <nav className="flex items-center gap-7 text-sm">
+          <Link href="/#problem" className="text-muted hover:text-fg no-underline hidden sm:block">
+            Problem
+          </Link>
+          <Link href="/#how" className="text-muted hover:text-fg no-underline hidden sm:block">
+            How it works
+          </Link>
+          <Link
+            href="/studio"
+            className="text-bg bg-accent px-4 py-2 font-medium no-underline hover:opacity-90"
+          >
+            Open studio →
+          </Link>
+        </nav>
+      </div>
+    </header>
+  );
+}
+
+function Footer() {
+  return (
+    <footer className="border-t border-line mt-24">
+      <div className="mx-auto max-w-6xl px-6 py-10 flex flex-col sm:flex-row gap-4 justify-between text-sm text-faint">
+        <span className="font-mono">
+          SYNTH-FIN · CTGAN from scratch · PyTorch · FastAPI · Next.js
+        </span>
+        <span>Built by Abdoulie Balisa — research portfolio.</span>
+      </div>
+    </footer>
+  );
+}
+
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  return (
+    <html
+      lang="en"
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+    >
+      <body className="min-h-full flex flex-col bg-bg text-fg">
+        <Nav />
+        <main className="flex-1">{children}</main>
+        <Footer />
+      </body>
+    </html>
+  );
+}

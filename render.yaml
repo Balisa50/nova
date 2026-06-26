@@ -1,0 +1,22 @@
+# Render blueprint for the SYNTH-FIN FastAPI backend.
+# Deploy: push to GitHub, then "New + > Blueprint" on Render and point it here.
+#
+# Note on resources: PyTorch (CPU) + RandomForest validation on 10k rows needs
+# more than the 512 MB free tier offers comfortably. Use at least the Starter
+# plan, or set MAX_ROWS lower for the free tier.
+services:
+  - type: web
+    name: synth-fin-backend
+    runtime: python
+    plan: starter
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.6"
+      - key: CORS_ORIGINS
+        value: "*"          # tighten to your Vercel domain in production
+      - key: MAX_ROWS
+        value: "20000"

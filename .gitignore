@@ -7,10 +7,12 @@ venv/
 .pytest_cache/
 .ipynb_checkpoints/
 
-# Models & large artifacts (tracked via Hugging Face / release, not git)
+# Models & large artifacts. The 3.5 MB final checkpoint is committed so the
+# backend deploys self-contained; other/larger checkpoints stay out of git.
 *.pth
 *.pt
 *.ckpt
+!backend/models/ctgan_final.pth
 
 # Data — keep the canonical ground-truth, ignore scratch generations
 backend/data/*.csv

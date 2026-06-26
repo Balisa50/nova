@@ -1,9 +1,9 @@
 <!-- markdownlint-disable MD013 MD033 -->
-# SYNTH-FIN
+# NOVA
 
 **Privacy-safe synthetic data generation for West African microfinance — a Conditional Tabular GAN (CTGAN) built from scratch in PyTorch, validated with four rigorous metrics, and served through a FastAPI + Next.js web app.**
 
-Financial institutions across West Africa hold sensitive customer data they cannot legally share, while startups and researchers have almost no data to build credit and inclusion models on. SYNTH-FIN learns the *statistical structure* of microfinance loan data and generates entirely new, synthetic records that preserve distributions and correlations, cannot be traced back to real individuals, and remain useful for machine learning.
+Financial institutions across West Africa hold sensitive customer data they cannot legally share, while startups and researchers have almost no data to build credit and inclusion models on. NOVA learns the *statistical structure* of microfinance loan data and generates entirely new, synthetic records that preserve distributions and correlations, cannot be traced back to real individuals, and remain useful for machine learning.
 
 > This is a research-portfolio project. Every component — the dataset generator, the CTGAN, the preprocessing, and the validation suite — is implemented from first principles. No `sdv`/`ctgan` library is used for the model.
 
@@ -27,7 +27,7 @@ Financial institutions across West Africa hold sensitive customer data they cann
 ## What's inside
 
 ```
-synth-fin/
+nova/
 ├── backend/
 │   ├── synthfin/
 │   │   ├── data/generator.py    # structural-causal ground-truth generator

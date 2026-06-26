@@ -308,7 +308,7 @@ def validate_all(real: pd.DataFrame, synth: pd.DataFrame, schema: dict,
 
 def print_report(report: dict) -> None:
     s = report["statistical"]["summary"]
-    print("\n=== SYNTH-FIN validation report ===")
+    print("\n=== NOVA validation report ===")
     print(f"1. Statistical similarity : pass_rate={s['pass_rate']:.2%} "
           f"(mean_sim={s['mean_similarity']:.3f}) over {s['n_columns']} cols "
           f"-> {'PASS' if s['overall_pass'] else 'FAIL'}")

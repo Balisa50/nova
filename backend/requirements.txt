@@ -1,4 +1,4 @@
-# SYNTH-FIN backend
+# NOVA backend
 # Core ML / data
 numpy>=1.26
 pandas>=2.1

@@ -1,1 +1,1 @@
-"""SYNTH-FIN FastAPI application."""
+"""NOVA FastAPI application."""

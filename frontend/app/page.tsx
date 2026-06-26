@@ -46,7 +46,7 @@ export default function Home() {
         </h1>
         <p className="mt-8 max-w-2xl text-lg text-muted leading-relaxed">
           Sensitive customer data can&apos;t leave the building — so the models that could
-          widen financial inclusion in West Africa never get trained. SYNTH-FIN breaks the
+          widen financial inclusion in West Africa never get trained. NOVA breaks the
           deadlock: a generative engine that produces{" "}
           <span className="text-fg">privacy-safe, statistically identical</span> microfinance
           data, on demand.
@@ -59,7 +59,7 @@ export default function Home() {
             Generate synthetic data →
           </Link>
           <a
-            href="https://github.com/Balisa50/synth-fin"
+            href="https://github.com/Balisa50/nova"
             className="text-muted hover:text-fg no-underline border-b border-line-strong pb-0.5"
           >
             Read the source

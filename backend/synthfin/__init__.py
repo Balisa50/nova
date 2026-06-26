@@ -1,3 +1,3 @@
-"""SYNTH-FIN: synthetic financial data generation for West African microfinance."""
+"""NOVA: synthetic financial data generation for West African microfinance."""
 
 __version__ = "0.1.0"

@@ -1,5 +1,5 @@
 """
-SYNTH-FIN FastAPI backend.
+NOVA FastAPI backend.
 
 Endpoints:
     GET  /api/health    -> liveness + whether a model is loaded
@@ -22,7 +22,7 @@ from fastapi.responses import PlainTextResponse
 from .service import DEFAULT_CSV, SynthFinService
 
 app = FastAPI(
-    title="SYNTH-FIN API",
+    title="NOVA API",
     version="1.0.0",
     description="Privacy-safe synthetic financial data for West African microfinance.",
 )
@@ -97,4 +97,4 @@ async def generate(
 
 @app.get("/")
 def root():
-    return {"name": "SYNTH-FIN API", "docs": "/docs", "health": "/api/health"}
+    return {"name": "NOVA API", "docs": "/docs", "health": "/api/health"}

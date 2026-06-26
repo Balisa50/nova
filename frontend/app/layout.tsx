@@ -7,7 +7,7 @@ const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "SYNTH-FIN — Synthetic financial data for West Africa",
+  title: "NOVA — Synthetic financial data for West Africa",
   description:
     "A Conditional Tabular GAN, built from scratch, that generates privacy-safe, statistically faithful microfinance data for West African fintech.",
 };
@@ -19,7 +19,7 @@ function Nav() {
         <Link href="/" className="flex items-center gap-2 no-underline">
           <span className="block w-2.5 h-2.5 bg-accent live-dot" />
           <span className="font-mono font-semibold tracking-tight text-fg">
-            SYNTH<span className="text-accent">-</span>FIN
+            NO<span className="text-accent">V</span>A
           </span>
         </Link>
         <nav className="flex items-center gap-7 text-sm">
@@ -46,7 +46,7 @@ function Footer() {
     <footer className="border-t border-line mt-24">
       <div className="mx-auto max-w-6xl px-6 py-10 flex flex-col sm:flex-row gap-4 justify-between text-sm text-faint">
         <span className="font-mono">
-          SYNTH-FIN · CTGAN from scratch · PyTorch · FastAPI · Next.js
+          NOVA · CTGAN from scratch · PyTorch · FastAPI · Next.js
         </span>
         <span>Built by Abdoulie Balisa — research portfolio.</span>
       </div>

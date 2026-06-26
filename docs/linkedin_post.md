@@ -6,7 +6,7 @@ Banks in West Africa are sitting on the exact data that could widen financial in
 
 So the startups and researchers who could build credit and inclusion models have nothing to train on. Sensitive data stays locked in the building; innovation never starts.
 
-I built **SYNTH-FIN** to break that deadlock.
+I built **NOVA** to break that deadlock.
 
 It's a generative AI system that learns the statistical structure of a real microfinance loan book and produces brand-new, synthetic records — data that's statistically faithful, useful for ML, and traceable to no real person.
 

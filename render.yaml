@@ -1,4 +1,4 @@
-# Render blueprint for the SYNTH-FIN FastAPI backend.
+# Render blueprint for the NOVA FastAPI backend.
 # Deploy: push to GitHub, then "New + > Blueprint" on Render and point it here.
 #
 # Note on resources: PyTorch (CPU) + RandomForest validation on 10k rows needs
@@ -6,7 +6,7 @@
 # plan, or set MAX_ROWS lower for the free tier.
 services:
   - type: web
-    name: synth-fin-backend
+    name: nova-backend
     runtime: python
     plan: starter
     rootDir: backend

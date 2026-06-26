@@ -1,4 +1,4 @@
-# Building SYNTH-FIN: A Generative AI System for Synthetic Financial Data in West Africa
+# Building NOVA: A Generative AI System for Synthetic Financial Data in West Africa
 
 *How I implemented a Conditional Tabular GAN from scratch, validated it four different ways, and shipped it as a web app — to attack one of the quietest bottlenecks in African fintech: data.*
 
@@ -12,7 +12,7 @@ The data sits in silos because it is sensitive. A microfinance institution canno
 
 Synthetic data is the most credible way out of that deadlock. If we can train a model to learn the *statistical shape* of a real loan book — its distributions, its correlations, the way default risk actually behaves — and then generate brand-new records that share that shape without copying any real person, we get something genuinely useful: data you can share, publish, and build on, with the privacy problem designed out from the start.
 
-**SYNTH-FIN** is my attempt to build that system end to end, and to build it honestly — implementing the model from first principles rather than calling a library, and proving the output is good with rigorous validation rather than asserting it. This article walks through the whole thing: the problem, the theory, the implementation, the results, and the parts I had to make judgement calls on.
+**NOVA** is my attempt to build that system end to end, and to build it honestly — implementing the model from first principles rather than calling a library, and proving the output is good with rigorous validation rather than asserting it. This article walks through the whole thing: the problem, the theory, the implementation, the results, and the parts I had to make judgement calls on.
 
 ## 2. The problem: data scarcity in West African finance
 
@@ -24,7 +24,7 @@ Three forces combine to starve the region's AI ecosystem of training data.
 
 **The cold-start trap for builders.** A fintech founder who wants to build a credit-scoring model needs data to train it. But they have no customers yet, so they have no data — and no institution will lend them theirs. The result is that promising ideas die before the first model is trained.
 
-The market backdrop makes the stakes concrete. Industry analysts repeatedly find that the majority of AI projects stall on data problems, that data preparation eats most of an AI budget, and that privacy is the number-one barrier banks cite to AI adoption. Meanwhile the synthetic-data market itself is projected to grow roughly ten-fold by the end of the decade. The demand is real; what's missing is accessible, domain-specific tooling. SYNTH-FIN is a small, concrete step toward that.
+The market backdrop makes the stakes concrete. Industry analysts repeatedly find that the majority of AI projects stall on data problems, that data preparation eats most of an AI budget, and that privacy is the number-one barrier banks cite to AI adoption. Meanwhile the synthetic-data market itself is projected to grow roughly ten-fold by the end of the decade. The demand is real; what's missing is accessible, domain-specific tooling. NOVA is a small, concrete step toward that.
 
 ## 3. What is synthetic data?
 
@@ -41,7 +41,7 @@ These properties are in tension. A model that simply memorised and replayed the 
 
 ## 4. Technical architecture
 
-SYNTH-FIN is built in clean layers, each independently testable:
+NOVA is built in clean layers, each independently testable:
 
 - **A ground-truth generator** produces a realistic, correlated West African loan dataset to train and validate against.
 - **A preprocessing pipeline** converts mixed tabular data into the representation a GAN can learn from, and back again.
@@ -66,7 +66,7 @@ The payoff is that the required correlations *emerge from a story* instead of be
 
 The core of the project is a Conditional Tabular GAN, implemented from scratch in PyTorch following Xu et al. (2019). Tabular data breaks naive GANs in two specific ways, and CTGAN's design is a direct answer to both.
 
-**Problem one: continuous columns are multimodal.** A column like loan amount isn't a single bell curve; it's several clusters. If you normalise it to a single Gaussian, the generator can't reach the modes. CTGAN's answer is **mode-specific normalization**: fit a Bayesian Gaussian mixture per column, and represent each value as a scalar (how far it sits from its cluster's mean, scaled) plus a one-hot vector saying *which* cluster. The generator emits a `tanh` scalar and a softmax over modes, and can therefore reproduce multimodal shapes. In SYNTH-FIN this lives in a `DataTransformer` that also guarantees a lossless inverse transform — I verify the round-trip explicitly, with every categorical column recovered exactly and every continuous column within a tight tolerance.
+**Problem one: continuous columns are multimodal.** A column like loan amount isn't a single bell curve; it's several clusters. If you normalise it to a single Gaussian, the generator can't reach the modes. CTGAN's answer is **mode-specific normalization**: fit a Bayesian Gaussian mixture per column, and represent each value as a scalar (how far it sits from its cluster's mean, scaled) plus a one-hot vector saying *which* cluster. The generator emits a `tanh` scalar and a softmax over modes, and can therefore reproduce multimodal shapes. In NOVA this lives in a `DataTransformer` that also guarantees a lossless inverse transform — I verify the round-trip explicitly, with every categorical column recovered exactly and every continuous column within a tight tolerance.
 
 **Problem two: categorical imbalance.** If 25% of borrowers default and you sample training batches uniformly, the generator rarely sees defaulters and learns to ignore them. CTGAN's answer is **training-by-sampling with a conditional vector**: pick a column and a category, condition the generator on it, and draw real rows that match — and sample those categories by *log-frequency* so rare classes get airtime. My `DataSampler` implements exactly this, plus a generation-time mode that conditions on the real marginal frequencies (and an override so the API can dial the synthetic default rate up or down).
 
@@ -76,7 +76,7 @@ One honest engineering note: I use the canonical CTGAN width (256×256 residual 
 
 ## 7. Validation framework
 
-A synthetic-data system that you can't measure is a liability, not an asset. SYNTH-FIN scores every generation on four independent axes, each with an explicit pass threshold.
+A synthetic-data system that you can't measure is a liability, not an asset. NOVA scores every generation on four independent axes, each with an explicit pass threshold.
 
 **1. Statistical similarity.** For each continuous column, a two-sample Kolmogorov–Smirnov test; for each categorical column, a chi-square test of the category counts. We pass if at least 80% of columns are statistically indistinguishable (p > 0.05).
 
@@ -113,10 +113,10 @@ Future work is clear: differential-privacy guarantees on top of the empirical pr
 
 ## 10. Conclusion
 
-SYNTH-FIN started from a real, specific problem — the data deadlock that holds back financial inclusion in West Africa — and worked all the way down to the mathematics and back up to a deployed app. I implemented a CTGAN from first principles, built a structural-causal ground-truth dataset to train it on, validated the output four different ways, and wrapped the whole thing in an API and a web interface.
+NOVA started from a real, specific problem — the data deadlock that holds back financial inclusion in West Africa — and worked all the way down to the mathematics and back up to a deployed app. I implemented a CTGAN from first principles, built a structural-causal ground-truth dataset to train it on, validated the output four different ways, and wrapped the whole thing in an API and a web interface.
 
 The lesson I'll take into graduate study is that the hard part of applied AI is rarely the model in isolation; it's the honesty around it — building data you can trust, measuring what you actually care about, and being clear about the judgement calls. The code is open source. If it helps one builder skip the cold-start trap, it will have been worth it.
 
 ---
 
-*Code: github.com/Balisa50/synth-fin · Built by Abdoulie Balisa.*
+*Code: github.com/Balisa50/nova · Built by Abdoulie Balisa.*

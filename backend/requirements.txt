@@ -1,15 +1,19 @@
-# NOVA backend
-# Core ML / data
-numpy>=1.26
-pandas>=2.1
-scipy>=1.11
-scikit-learn>=1.4
-torch>=2.5
+# NOVA backend dependencies (pinned for reproducible Fly.io / container builds).
+#
+# torch is installed CPU-only in the Dockerfile (download.pytorch.org/whl/cpu)
+# so the ~2.5GB CUDA stack is never pulled. The pin here is just for parity.
+#
+# IMPORTANT: numpy MUST stay 2.x and scikit-learn 1.7.x. The trained model
+# checkpoint pickles numpy-2.x arrays and a scikit-learn 1.7.2
+# BayesianGaussianMixture; numpy 1.26 / sklearn 1.6 would fail at startup with
+# "ModuleNotFoundError: No module named 'numpy._core'".
+fastapi==0.115.6
+uvicorn[standard]==0.32.0
+python-multipart==0.0.20
+pydantic==2.10.3
 
-# API
-fastapi>=0.115
-uvicorn[standard]>=0.30
-python-multipart>=0.0.9
-
-# Dev / test
-pytest>=8.0
+numpy>=2.1,<2.4
+pandas>=2.2,<2.4
+scipy>=1.13,<1.16
+scikit-learn==1.7.2
+torch==2.5.1

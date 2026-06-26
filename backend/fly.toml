@@ -1,0 +1,23 @@
+app = "nova-backend"
+primary_region = "ewr"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  # Cap generation size to keep memory inside the 512MB machine. Bump this if
+  # you scale the VM up.
+  MAX_ROWS = "6000"
+  CORS_ORIGINS = "*"
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+
+[[vm]]
+  memory = "512mb"
+  cpu_kind = "shared"
+  cpus = 1

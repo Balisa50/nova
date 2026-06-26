@@ -1,11 +1,12 @@
 <!-- markdownlint-disable MD013 MD033 -->
 # NOVA
 
-**Privacy-safe synthetic data generation for West African microfinance — a Conditional Tabular GAN (CTGAN) built from scratch in PyTorch, validated with four rigorous metrics, and served through a FastAPI + Next.js web app.**
+**A universal synthetic-data engine for finance — with two modes — served through a FastAPI + Next.js web app.**
 
-Financial institutions across West Africa hold sensitive customer data they cannot legally share, while startups and researchers have almost no data to build credit and inclusion models on. NOVA learns the *statistical structure* of microfinance loan data and generates entirely new, synthetic records that preserve distributions and correlations, cannot be traced back to real individuals, and remain useful for machine learning.
+- **Create** *(from nothing)* — define columns, distributions and **domain rules**, and NOVA generates brand-new, realistic data **with no source dataset**. Ships with presets for seven financial domains (banking, payments/fraud, insurance, remittances, macro, wealth, corporate) — or define your own. This is the answer to data scarcity in understudied regions: anyone with domain knowledge can make the data they need.
+- **Copy** *(from real data)* — upload a CSV and a **Conditional Tabular GAN, built from scratch in PyTorch**, learns its joint distribution and generates statistically identical, privacy-safe rows, scored on four independent validation metrics.
 
-> This is a research-portfolio project. Every component — the dataset generator, the CTGAN, the preprocessing, and the validation suite — is implemented from first principles. No `sdv`/`ctgan` library is used for the model.
+> This is a research-portfolio project. Every component — the ground-truth generator, the CTGAN, the preprocessing, the validation suite, and the criteria engine — is implemented from first principles. No `sdv`/`ctgan` library is used for the model.
 
 ---
 
@@ -124,21 +125,40 @@ Two deliberate, documented departures from the original spec, both to be *more* 
 
 ## API
 
-| Endpoint | Method | Description |
-|---|---|---|
-| `/api/health` | GET | Liveness + whether a model is loaded |
-| `/api/status` | GET | Trained epochs, columns, target, device |
-| `/api/generate` | POST | CSV (optional) + `num_rows` + `default_rate` → synthetic preview, full CSV, validation metrics |
-| `/api/sample` | GET | Download a 1,000-row sample to try the app |
+| Endpoint | Method | Mode | Description |
+|---|---|---|---|
+| `/api/health` | GET | — | Liveness + whether a model is loaded |
+| `/api/status` | GET | — | Trained epochs, columns, target, device |
+| `/api/generate` | POST | Copy | CSV (optional) + `num_rows` + `default_rate` → synthetic preview, full CSV, validation metrics |
+| `/api/sample` | GET | Copy | Download a 1,000-row sample to try the app |
+| `/api/presets` | GET | Create | List the financial-domain criteria presets |
+| `/api/preset/{id}` | GET | Create | Full criteria spec for one preset |
+| `/api/generate-criteria` | POST | Create | `preset_id` **or** custom `spec` + `num_rows` → data generated from rules alone |
+
+## Create mode — the criteria engine
+
+`synthfin/criteria.py` generates data from a JSON spec of **columns + distributions + ordered rules**, no source data required:
+
+```jsonc
+{ "columns": [
+    {"name": "exam_score", "type": "continuous", "dist": {"dist": "normal", "mu": 62, "sigma": 18}, "min": 0, "max": 100},
+    {"name": "school_setting", "type": "categorical", "dist": {"dist": "categorical", "values": ["Urban","Rural"], "weights":[0.4,0.6]}},
+    {"name": "passed", "type": "binary"} ],
+  "rules": [
+    {"target": "exam_score", "when": "school_setting == 'Rural'", "expr": "exam_score - 8"},
+    {"target": "passed", "expr": "exam_score >= 40"} ] }
+```
+
+Rule conditions/expressions are evaluated by a **whitelist AST evaluator** (never `eval()`), so a spec that arrives over the API cannot inject code — attribute access, arbitrary calls, subscripting and lambdas are all rejected. Run `python -m scripts.check_criteria` to see the rural-Gambia student example reproduce its domain rules and block three injection attempts; `python -m scripts.build_presets` writes and smoke-tests the seven domain presets.
 
 ## Web app
 
-Next.js 16 (App Router) + TypeScript + Tailwind. Three flows: a landing page that frames the problem, a generate page (drag-and-drop CSV, row count, default-rate slider), and a results view (validation dashboard, data preview, CSV download). The UI is intentionally **flat** — accent rules and dividers instead of boxed cards.
+Next.js 16 (App Router) + TypeScript + Tailwind. A **Create / Copy** mode toggle drives the studio: Create lets you pick a domain (or edit the raw spec) and generate from rules; Copy is the drag-and-drop CSV → CTGAN flow with the four-metric dashboard. The UI is intentionally **flat** — accent rules and dividers instead of boxed cards.
 
 ## Deployment
 
-- **Frontend → Vercel.** Set `NEXT_PUBLIC_BACKEND_URL` to the backend URL.
-- **Backend → Render** via `render.yaml`. PyTorch + RandomForest validation needs more than the 512 MB free tier; use Starter or lower `MAX_ROWS`.
+- **Frontend → Vercel.** Set `NEXT_PUBLIC_BACKEND_URL` (and `BACKEND_URL`) to the backend URL.
+- **Backend → Fly.io** via `backend/fly.toml` + `backend/Dockerfile` (CPU-only torch; numpy 2.x / scikit-learn 1.7.2 pinned so the checkpoint loads). `render.yaml` is kept as an alternative. PyTorch + RandomForest validation wants >512 MB for heavy `/generate`; bump the VM or lower `MAX_ROWS`. (Create mode is light and runs comfortably in 512 MB.)
 
 ## Design decisions & honesty notes
 

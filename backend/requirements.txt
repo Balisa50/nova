@@ -1,0 +1,15 @@
+# SYNTH-FIN backend
+# Core ML / data
+numpy>=1.26
+pandas>=2.1
+scipy>=1.11
+scikit-learn>=1.4
+torch>=2.5
+
+# API
+fastapi>=0.115
+uvicorn[standard]>=0.30
+python-multipart>=0.0.9
+
+# Dev / test
+pytest>=8.0

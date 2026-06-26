@@ -88,3 +88,90 @@ export async function generate(form: FormData): Promise<GenerateResponse> {
   }
   return res.json();
 }
+
+// --------------------------------------------------------------------------- //
+// Mode 2: Create (criteria engine — generate from domain knowledge, no data)
+// --------------------------------------------------------------------------- //
+export interface PresetSummary {
+  id: string;
+  name: string;
+  description: string;
+  domain: string;
+  target: string | null;
+  n_columns: number;
+  n_rules: number;
+}
+
+export interface ColumnSpec {
+  name: string;
+  type: string;
+  dist?: { dist?: string; [k: string]: unknown };
+  min?: number;
+  max?: number;
+}
+
+export interface RuleSpec {
+  target: string;
+  expr: string;
+  when?: string;
+}
+
+export interface CriteriaSpec {
+  id?: string;
+  name?: string;
+  description?: string;
+  domain?: string;
+  target?: string | null;
+  columns: ColumnSpec[];
+  rules?: RuleSpec[];
+}
+
+export interface CriteriaReport {
+  n_rows: number;
+  n_columns: number;
+  missing_values: number;
+  target: string | null;
+  target_rate: number | null;
+  columns: Record<string, { rate?: number; mean?: number; min?: number; max?: number }>;
+}
+
+export interface CriteriaResponse {
+  mode: string;
+  spec_name: string;
+  domain: string | null;
+  num_rows: number;
+  columns: string[];
+  preview: Record<string, string | number>[];
+  report: CriteriaReport;
+  csv: string;
+}
+
+export async function fetchPresets(): Promise<PresetSummary[]> {
+  const res = await fetch(`${BACKEND_URL}/api/presets`, { cache: "no-store" });
+  if (!res.ok) throw new Error(`presets ${res.status}`);
+  return (await res.json()).presets;
+}
+
+export async function fetchPreset(id: string): Promise<CriteriaSpec> {
+  const res = await fetch(`${BACKEND_URL}/api/preset/${id}`, { cache: "no-store" });
+  if (!res.ok) throw new Error(`preset ${res.status}`);
+  return res.json();
+}
+
+export async function generateCriteria(body: {
+  preset_id?: string;
+  spec?: CriteriaSpec;
+  num_rows: number;
+  seed?: number;
+}): Promise<CriteriaResponse> {
+  const res = await fetch(`${BACKEND_URL}/api/generate-criteria`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    const d = await res.json().catch(() => ({}));
+    throw new Error(d?.detail || `Generation failed (${res.status})`);
+  }
+  return res.json();
+}

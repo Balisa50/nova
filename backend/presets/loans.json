@@ -1,0 +1,244 @@
+{
+  "id": "loans",
+  "name": "Banking \u2014 Microfinance Loans",
+  "description": "Credit/loan records for credit scoring and default-risk modelling.",
+  "domain": "Banking",
+  "target": "default",
+  "columns": [
+    {
+      "name": "borrower_id",
+      "type": "id",
+      "dist": {
+        "dist": "uuid"
+      }
+    },
+    {
+      "name": "age",
+      "type": "integer",
+      "dist": {
+        "dist": "normal",
+        "mu": 35,
+        "sigma": 12
+      },
+      "min": 18,
+      "max": 75
+    },
+    {
+      "name": "gender",
+      "type": "categorical",
+      "dist": {
+        "dist": "categorical",
+        "values": [
+          "Male",
+          "Female"
+        ],
+        "weights": [
+          0.4,
+          0.6
+        ]
+      }
+    },
+    {
+      "name": "education_level",
+      "type": "categorical",
+      "dist": {
+        "dist": "categorical",
+        "values": [
+          "None",
+          "Primary",
+          "Secondary",
+          "Tertiary"
+        ],
+        "weights": [
+          0.15,
+          0.3,
+          0.35,
+          0.2
+        ]
+      }
+    },
+    {
+      "name": "employment_type",
+      "type": "categorical",
+      "dist": {
+        "dist": "categorical",
+        "values": [
+          "Salaried",
+          "Self-employed",
+          "Informal",
+          "Unemployed"
+        ],
+        "weights": [
+          0.2,
+          0.35,
+          0.35,
+          0.1
+        ]
+      }
+    },
+    {
+      "name": "monthly_income_usd",
+      "type": "continuous",
+      "dist": {
+        "dist": "gamma",
+        "shape": 3,
+        "scale": 150
+      },
+      "min": 40,
+      "max": 3000
+    },
+    {
+      "name": "loan_amount_usd",
+      "type": "continuous",
+      "dist": {
+        "dist": "gamma",
+        "shape": 2,
+        "scale": 250
+      },
+      "min": 50,
+      "max": 2000
+    },
+    {
+      "name": "term_months",
+      "type": "categorical",
+      "dist": {
+        "dist": "categorical",
+        "values": [
+          3,
+          6,
+          9,
+          12,
+          18,
+          24
+        ],
+        "weights": [
+          0.18,
+          0.28,
+          0.16,
+          0.22,
+          0.1,
+          0.06
+        ]
+      }
+    },
+    {
+      "name": "interest_rate_apr",
+      "type": "continuous",
+      "dist": {
+        "dist": "normal",
+        "mu": 15,
+        "sigma": 3
+      },
+      "min": 8,
+      "max": 30
+    },
+    {
+      "name": "has_collateral",
+      "type": "binary",
+      "dist": {
+        "dist": "bernoulli",
+        "p": 0.3
+      }
+    },
+    {
+      "name": "group_lending",
+      "type": "binary",
+      "dist": {
+        "dist": "bernoulli",
+        "p": 0.6
+      }
+    },
+    {
+      "name": "previous_defaults",
+      "type": "count",
+      "dist": {
+        "dist": "poisson",
+        "lam": 0.3
+      },
+      "min": 0,
+      "max": 5
+    },
+    {
+      "name": "credit_score",
+      "type": "integer",
+      "dist": {
+        "dist": "normal",
+        "mu": 550,
+        "sigma": 100
+      },
+      "min": 300,
+      "max": 800
+    },
+    {
+      "name": "_u",
+      "type": "continuous",
+      "dist": {
+        "dist": "uniform",
+        "low": 0,
+        "high": 1
+      }
+    },
+    {
+      "name": "_p",
+      "type": "continuous",
+      "dist": {
+        "dist": "derived"
+      }
+    },
+    {
+      "name": "default",
+      "type": "binary",
+      "dist": {
+        "dist": "derived"
+      }
+    }
+  ],
+  "rules": [
+    {
+      "target": "loan_amount_usd",
+      "expr": "clip(loan_amount_usd*0.6 + monthly_income_usd*1.2, 50, 2000)"
+    },
+    {
+      "target": "_p",
+      "expr": "0.25"
+    },
+    {
+      "target": "_p",
+      "when": "has_collateral == 1",
+      "expr": "_p - 0.10"
+    },
+    {
+      "target": "_p",
+      "when": "group_lending == 1",
+      "expr": "_p - 0.07"
+    },
+    {
+      "target": "_p",
+      "when": "previous_defaults > 0",
+      "expr": "_p + 0.22"
+    },
+    {
+      "target": "_p",
+      "when": "interest_rate_apr > 18",
+      "expr": "_p + 0.10"
+    },
+    {
+      "target": "_p",
+      "when": "monthly_income_usd > 400",
+      "expr": "_p - 0.08"
+    },
+    {
+      "target": "_p",
+      "when": "credit_score < 480",
+      "expr": "_p + 0.10"
+    },
+    {
+      "target": "_p",
+      "expr": "clip(_p, 0.02, 0.95)"
+    },
+    {
+      "target": "default",
+      "expr": "_u < _p"
+    }
+  ]
+}

@@ -1,0 +1,190 @@
+{
+  "id": "investment",
+  "name": "Investment \u2014 Portfolios & Returns",
+  "description": "Portfolio holdings for asset allocation and risk modelling.",
+  "domain": "Wealth",
+  "target": "is_underwater",
+  "columns": [
+    {
+      "name": "portfolio_id",
+      "type": "id",
+      "dist": {
+        "dist": "uuid"
+      }
+    },
+    {
+      "name": "investor_age",
+      "type": "integer",
+      "dist": {
+        "dist": "normal",
+        "mu": 50,
+        "sigma": 15
+      },
+      "min": 18,
+      "max": 90
+    },
+    {
+      "name": "investor_risk_profile",
+      "type": "categorical",
+      "dist": {
+        "dist": "categorical",
+        "values": [
+          "Conservative",
+          "Moderate",
+          "Aggressive"
+        ],
+        "weights": [
+          0.35,
+          0.4,
+          0.25
+        ]
+      }
+    },
+    {
+      "name": "asset_class",
+      "type": "categorical",
+      "dist": {
+        "dist": "categorical",
+        "values": [
+          "Equity",
+          "Fixed Income",
+          "Real Estate",
+          "Commodities",
+          "Cash"
+        ],
+        "weights": [
+          0.4,
+          0.25,
+          0.15,
+          0.1,
+          0.1
+        ]
+      }
+    },
+    {
+      "name": "market_sector",
+      "type": "categorical",
+      "dist": {
+        "dist": "categorical",
+        "values": [
+          "Tech",
+          "Finance",
+          "Healthcare",
+          "Consumer",
+          "Energy"
+        ]
+      }
+    },
+    {
+      "name": "country_exposure",
+      "type": "categorical",
+      "dist": {
+        "dist": "categorical",
+        "values": [
+          "Developed",
+          "Emerging",
+          "Frontier"
+        ],
+        "weights": [
+          0.5,
+          0.35,
+          0.15
+        ]
+      }
+    },
+    {
+      "name": "investment_amount_usd",
+      "type": "continuous",
+      "dist": {
+        "dist": "gamma",
+        "shape": 2,
+        "scale": 50000
+      },
+      "min": 500,
+      "max": 5000000
+    },
+    {
+      "name": "annual_return_pct",
+      "type": "continuous",
+      "dist": {
+        "dist": "normal",
+        "mu": 8,
+        "sigma": 15
+      },
+      "min": -60,
+      "max": 80
+    },
+    {
+      "name": "volatility_pct",
+      "type": "continuous",
+      "dist": {
+        "dist": "normal",
+        "mu": 15,
+        "sigma": 8
+      },
+      "min": 0,
+      "max": 60
+    },
+    {
+      "name": "dividend_yield_pct",
+      "type": "continuous",
+      "dist": {
+        "dist": "normal",
+        "mu": 2,
+        "sigma": 1.5
+      },
+      "min": 0,
+      "max": 10
+    },
+    {
+      "name": "risk_rating",
+      "type": "integer",
+      "dist": {
+        "dist": "uniform",
+        "low": 1,
+        "high": 5
+      },
+      "min": 1,
+      "max": 5
+    },
+    {
+      "name": "current_value_usd",
+      "type": "continuous",
+      "dist": {
+        "dist": "derived"
+      }
+    },
+    {
+      "name": "is_underwater",
+      "type": "binary",
+      "dist": {
+        "dist": "derived"
+      }
+    }
+  ],
+  "rules": [
+    {
+      "target": "volatility_pct",
+      "when": "investor_risk_profile == 'Aggressive'",
+      "expr": "volatility_pct + 10"
+    },
+    {
+      "target": "annual_return_pct",
+      "when": "asset_class == 'Cash'",
+      "expr": "2"
+    },
+    {
+      "target": "volatility_pct",
+      "when": "asset_class == 'Cash'",
+      "expr": "1"
+    },
+    {
+      "target": "current_value_usd",
+      "expr": "clip(investment_amount_usd * (1 + annual_return_pct/100), 0, 1000000000)"
+    },
+    {
+      "target": "is_underwater",
+      "expr": "annual_return_pct < 0"
+    }
+  ]
+}

@@ -1,0 +1,193 @@
+{
+  "id": "corporate",
+  "name": "Corporate \u2014 Financial Statements",
+  "description": "Company financials for credit analysis and valuation.",
+  "domain": "Corporate",
+  "target": null,
+  "columns": [
+    {
+      "name": "company_id",
+      "type": "id",
+      "dist": {
+        "dist": "uuid"
+      }
+    },
+    {
+      "name": "industry",
+      "type": "categorical",
+      "dist": {
+        "dist": "categorical",
+        "values": [
+          "Agriculture",
+          "Manufacturing",
+          "Retail",
+          "Technology",
+          "Finance",
+          "Services"
+        ]
+      }
+    },
+    {
+      "name": "year",
+      "type": "integer",
+      "dist": {
+        "dist": "uniform",
+        "low": 2020,
+        "high": 2025
+      },
+      "min": 2020,
+      "max": 2025
+    },
+    {
+      "name": "revenue_usd",
+      "type": "continuous",
+      "dist": {
+        "dist": "gamma",
+        "shape": 2,
+        "scale": 10000000
+      },
+      "min": 10000,
+      "max": 5000000000
+    },
+    {
+      "name": "total_assets_usd",
+      "type": "continuous",
+      "dist": {
+        "dist": "gamma",
+        "shape": 2,
+        "scale": 15000000
+      },
+      "min": 10000,
+      "max": 8000000000
+    },
+    {
+      "name": "total_liabilities_usd",
+      "type": "continuous",
+      "dist": {
+        "dist": "gamma",
+        "shape": 2,
+        "scale": 8000000
+      },
+      "min": 0,
+      "max": 6000000000
+    },
+    {
+      "name": "current_ratio",
+      "type": "continuous",
+      "dist": {
+        "dist": "normal",
+        "mu": 1.8,
+        "sigma": 0.6
+      },
+      "min": 0.1,
+      "max": 6
+    },
+    {
+      "name": "roe_pct",
+      "type": "continuous",
+      "dist": {
+        "dist": "normal",
+        "mu": 12,
+        "sigma": 5
+      },
+      "min": -30,
+      "max": 60
+    },
+    {
+      "name": "gross_margin_pct",
+      "type": "continuous",
+      "dist": {
+        "dist": "normal",
+        "mu": 35,
+        "sigma": 10
+      },
+      "min": 0,
+      "max": 90
+    },
+    {
+      "name": "operating_margin_pct",
+      "type": "continuous",
+      "dist": {
+        "dist": "normal",
+        "mu": 10,
+        "sigma": 5
+      },
+      "min": -20,
+      "max": 50
+    },
+    {
+      "name": "employees_count",
+      "type": "integer",
+      "dist": {
+        "dist": "gamma",
+        "shape": 2,
+        "scale": 100
+      },
+      "min": 1,
+      "max": 100000
+    },
+    {
+      "name": "auditor",
+      "type": "categorical",
+      "dist": {
+        "dist": "categorical",
+        "values": [
+          "Big 4",
+          "Regional",
+          "Local"
+        ],
+        "weights": [
+          0.3,
+          0.4,
+          0.3
+        ]
+      }
+    },
+    {
+      "name": "net_income_usd",
+      "type": "continuous",
+      "dist": {
+        "dist": "derived"
+      }
+    },
+    {
+      "name": "equity_usd",
+      "type": "continuous",
+      "dist": {
+        "dist": "derived"
+      }
+    },
+    {
+      "name": "debt_to_equity_ratio",
+      "type": "continuous",
+      "dist": {
+        "dist": "derived"
+      }
+    },
+    {
+      "name": "financial_health_score",
+      "type": "continuous",
+      "dist": {
+        "dist": "derived"
+      }
+    }
+  ],
+  "rules": [
+    {
+      "target": "net_income_usd",
+      "expr": "revenue_usd * (operating_margin_pct / 100)"
+    },
+    {
+      "target": "equity_usd",
+      "expr": "total_assets_usd - total_liabilities_usd"
+    },
+    {
+      "target": "debt_to_equity_ratio",
+      "expr": "clip(total_liabilities_usd / clip(equity_usd, 1.0, 100000000000), 0, 20)"
+    },
+    {
+      "target": "financial_health_score",
+      "expr": "clip(60 + roe_pct - debt_to_equity_ratio*4 + (current_ratio - 1.8)*6, 0, 100)"
+    }
+  ]
+}

@@ -1,0 +1,162 @@
+{
+  "id": "macro",
+  "name": "Macro \u2014 Economic Indicators",
+  "description": "Quarterly macroeconomic indicators for policy and regulatory analysis.",
+  "domain": "Macro",
+  "target": null,
+  "columns": [
+    {
+      "name": "indicator_id",
+      "type": "id",
+      "dist": {
+        "dist": "uuid"
+      }
+    },
+    {
+      "name": "country",
+      "type": "categorical",
+      "dist": {
+        "dist": "categorical",
+        "values": [
+          "Gambia",
+          "Senegal",
+          "Nigeria",
+          "Ghana",
+          "Mali",
+          "Guinea"
+        ]
+      }
+    },
+    {
+      "name": "year",
+      "type": "integer",
+      "dist": {
+        "dist": "uniform",
+        "low": 2000,
+        "high": 2025
+      },
+      "min": 2000,
+      "max": 2025
+    },
+    {
+      "name": "quarter",
+      "type": "integer",
+      "dist": {
+        "dist": "uniform",
+        "low": 1,
+        "high": 4
+      },
+      "min": 1,
+      "max": 4
+    },
+    {
+      "name": "gdp_growth",
+      "type": "continuous",
+      "dist": {
+        "dist": "normal",
+        "mu": 3,
+        "sigma": 2
+      },
+      "min": -8,
+      "max": 12
+    },
+    {
+      "name": "inflation_rate",
+      "type": "continuous",
+      "dist": {
+        "dist": "normal",
+        "mu": 8,
+        "sigma": 3
+      },
+      "min": 0,
+      "max": 40
+    },
+    {
+      "name": "unemployment_rate",
+      "type": "continuous",
+      "dist": {
+        "dist": "normal",
+        "mu": 8,
+        "sigma": 4
+      },
+      "min": 0,
+      "max": 40
+    },
+    {
+      "name": "interest_rate",
+      "type": "continuous",
+      "dist": {
+        "dist": "normal",
+        "mu": 15,
+        "sigma": 5
+      },
+      "min": 1,
+      "max": 40
+    },
+    {
+      "name": "exchange_rate",
+      "type": "continuous",
+      "dist": {
+        "dist": "normal",
+        "mu": 500,
+        "sigma": 100
+      },
+      "min": 50,
+      "max": 2000
+    },
+    {
+      "name": "government_debt_pct_gdp",
+      "type": "continuous",
+      "dist": {
+        "dist": "normal",
+        "mu": 60,
+        "sigma": 20
+      },
+      "min": 0,
+      "max": 200
+    },
+    {
+      "name": "tax_revenue_pct_gdp",
+      "type": "continuous",
+      "dist": {
+        "dist": "normal",
+        "mu": 12,
+        "sigma": 4
+      },
+      "min": 0,
+      "max": 40
+    },
+    {
+      "name": "population_growth",
+      "type": "continuous",
+      "dist": {
+        "dist": "normal",
+        "mu": 2.5,
+        "sigma": 0.5
+      },
+      "min": 0,
+      "max": 5
+    },
+    {
+      "name": "poverty_rate",
+      "type": "continuous",
+      "dist": {
+        "dist": "normal",
+        "mu": 35,
+        "sigma": 10
+      },
+      "min": 0,
+      "max": 90
+    }
+  ],
+  "rules": [
+    {
+      "target": "gdp_growth",
+      "expr": "gdp_growth - (year - 2012) * 0.05"
+    },
+    {
+      "target": "interest_rate",
+      "expr": "clip(inflation_rate + 5 + (interest_rate - 15) * 0.3, 1, 40)"
+    }
+  ]
+}

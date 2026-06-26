@@ -1,0 +1,247 @@
+{
+  "id": "insurance",
+  "name": "Insurance \u2014 Claims & Actuarial",
+  "description": "Policy/claims records for actuarial pricing and risk modelling.",
+  "domain": "Insurance",
+  "target": "claim",
+  "columns": [
+    {
+      "name": "policy_id",
+      "type": "id",
+      "dist": {
+        "dist": "uuid"
+      }
+    },
+    {
+      "name": "insured_age",
+      "type": "integer",
+      "dist": {
+        "dist": "normal",
+        "mu": 45,
+        "sigma": 15
+      },
+      "min": 18,
+      "max": 90
+    },
+    {
+      "name": "insured_gender",
+      "type": "categorical",
+      "dist": {
+        "dist": "categorical",
+        "values": [
+          "Male",
+          "Female"
+        ],
+        "weights": [
+          0.48,
+          0.52
+        ]
+      }
+    },
+    {
+      "name": "policy_type",
+      "type": "categorical",
+      "dist": {
+        "dist": "categorical",
+        "values": [
+          "Life",
+          "Health",
+          "Auto",
+          "Property"
+        ],
+        "weights": [
+          0.25,
+          0.3,
+          0.25,
+          0.2
+        ]
+      }
+    },
+    {
+      "name": "policy_term_years",
+      "type": "categorical",
+      "dist": {
+        "dist": "categorical",
+        "values": [
+          1,
+          2,
+          3,
+          5,
+          10
+        ],
+        "weights": [
+          0.25,
+          0.2,
+          0.2,
+          0.2,
+          0.15
+        ]
+      }
+    },
+    {
+      "name": "premium_usd",
+      "type": "continuous",
+      "dist": {
+        "dist": "gamma",
+        "shape": 2,
+        "scale": 1000
+      },
+      "min": 50,
+      "max": 50000
+    },
+    {
+      "name": "sum_assured_usd",
+      "type": "continuous",
+      "dist": {
+        "dist": "gamma",
+        "shape": 2,
+        "scale": 50000
+      },
+      "min": 1000,
+      "max": 2000000
+    },
+    {
+      "name": "smoking_status",
+      "type": "categorical",
+      "dist": {
+        "dist": "categorical",
+        "values": [
+          "Smoker",
+          "Non-smoker",
+          "Former"
+        ],
+        "weights": [
+          0.18,
+          0.7,
+          0.12
+        ]
+      }
+    },
+    {
+      "name": "bmi",
+      "type": "continuous",
+      "dist": {
+        "dist": "normal",
+        "mu": 27,
+        "sigma": 5
+      },
+      "min": 15,
+      "max": 50
+    },
+    {
+      "name": "occupation_risk",
+      "type": "categorical",
+      "dist": {
+        "dist": "categorical",
+        "values": [
+          "Low",
+          "Medium",
+          "High"
+        ],
+        "weights": [
+          0.5,
+          0.35,
+          0.15
+        ]
+      }
+    },
+    {
+      "name": "region",
+      "type": "categorical",
+      "dist": {
+        "dist": "categorical",
+        "values": [
+          "Urban",
+          "Suburban",
+          "Rural"
+        ],
+        "weights": [
+          0.5,
+          0.3,
+          0.2
+        ]
+      }
+    },
+    {
+      "name": "has_made_previous_claim",
+      "type": "binary",
+      "dist": {
+        "dist": "bernoulli",
+        "p": 0.2
+      }
+    },
+    {
+      "name": "customer_tenure_years",
+      "type": "continuous",
+      "dist": {
+        "dist": "gamma",
+        "shape": 2,
+        "scale": 5
+      },
+      "min": 0,
+      "max": 40
+    },
+    {
+      "name": "_u",
+      "type": "continuous",
+      "dist": {
+        "dist": "uniform",
+        "low": 0,
+        "high": 1
+      }
+    },
+    {
+      "name": "_p",
+      "type": "continuous",
+      "dist": {
+        "dist": "derived"
+      }
+    },
+    {
+      "name": "claim",
+      "type": "binary",
+      "dist": {
+        "dist": "derived"
+      }
+    }
+  ],
+  "rules": [
+    {
+      "target": "_p",
+      "expr": "0.08"
+    },
+    {
+      "target": "_p",
+      "when": "occupation_risk == 'High'",
+      "expr": "_p + 0.17"
+    },
+    {
+      "target": "_p",
+      "when": "(policy_type == 'Health') and (smoking_status == 'Smoker')",
+      "expr": "_p + 0.22"
+    },
+    {
+      "target": "_p",
+      "when": "has_made_previous_claim == 1",
+      "expr": "_p + 0.30"
+    },
+    {
+      "target": "_p",
+      "when": "bmi > 32",
+      "expr": "_p + 0.08"
+    },
+    {
+      "target": "_p",
+      "when": "insured_age > 65",
+      "expr": "_p + 0.07"
+    },
+    {
+      "target": "_p",
+      "expr": "clip(_p, 0.01, 0.95)"
+    },
+    {
+      "target": "claim",
+      "expr": "_u < _p"
+    }
+  ]
+}

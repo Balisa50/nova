@@ -1,0 +1,203 @@
+{
+  "id": "transactions",
+  "name": "Transactions \u2014 Fraud Detection",
+  "description": "Payment/transfer records for fraud and AML modelling (~2-5% fraud).",
+  "domain": "Payments",
+  "target": "fraud",
+  "columns": [
+    {
+      "name": "transaction_id",
+      "type": "id",
+      "dist": {
+        "dist": "uuid"
+      }
+    },
+    {
+      "name": "user_id",
+      "type": "id",
+      "dist": {
+        "dist": "uuid"
+      }
+    },
+    {
+      "name": "transaction_type",
+      "type": "categorical",
+      "dist": {
+        "dist": "categorical",
+        "values": [
+          "Transfer",
+          "Purchase",
+          "Withdrawal",
+          "Deposit"
+        ],
+        "weights": [
+          0.3,
+          0.4,
+          0.2,
+          0.1
+        ]
+      }
+    },
+    {
+      "name": "amount_usd",
+      "type": "continuous",
+      "dist": {
+        "dist": "gamma",
+        "shape": 1.5,
+        "scale": 120
+      },
+      "min": 1,
+      "max": 20000
+    },
+    {
+      "name": "sender_tenure_months",
+      "type": "continuous",
+      "dist": {
+        "dist": "gamma",
+        "shape": 2,
+        "scale": 24
+      },
+      "min": 0,
+      "max": 240
+    },
+    {
+      "name": "merchant_category",
+      "type": "categorical",
+      "dist": {
+        "dist": "categorical",
+        "values": [
+          "Retail",
+          "Food",
+          "Transport",
+          "Online",
+          "Services"
+        ],
+        "weights": [
+          0.3,
+          0.25,
+          0.15,
+          0.18,
+          0.12
+        ]
+      }
+    },
+    {
+      "name": "location_region",
+      "type": "categorical",
+      "dist": {
+        "dist": "categorical",
+        "values": [
+          "Urban",
+          "Rural",
+          "International"
+        ],
+        "weights": [
+          0.6,
+          0.3,
+          0.1
+        ]
+      }
+    },
+    {
+      "name": "device_type",
+      "type": "categorical",
+      "dist": {
+        "dist": "categorical",
+        "values": [
+          "Mobile",
+          "Desktop",
+          "Unknown"
+        ],
+        "weights": [
+          0.65,
+          0.3,
+          0.05
+        ]
+      }
+    },
+    {
+      "name": "transaction_hour",
+      "type": "integer",
+      "dist": {
+        "dist": "uniform",
+        "low": 0,
+        "high": 23
+      },
+      "min": 0,
+      "max": 23
+    },
+    {
+      "name": "is_weekend",
+      "type": "binary",
+      "dist": {
+        "dist": "bernoulli",
+        "p": 0.3
+      }
+    },
+    {
+      "name": "flagged_suspicious",
+      "type": "binary",
+      "dist": {
+        "dist": "bernoulli",
+        "p": 0.05
+      }
+    },
+    {
+      "name": "_u",
+      "type": "continuous",
+      "dist": {
+        "dist": "uniform",
+        "low": 0,
+        "high": 1
+      }
+    },
+    {
+      "name": "_p",
+      "type": "continuous",
+      "dist": {
+        "dist": "derived"
+      }
+    },
+    {
+      "name": "fraud",
+      "type": "binary",
+      "dist": {
+        "dist": "derived"
+      }
+    }
+  ],
+  "rules": [
+    {
+      "target": "_p",
+      "expr": "0.02"
+    },
+    {
+      "target": "_p",
+      "when": "(amount_usd > 800) and (location_region == 'International')",
+      "expr": "_p + 0.45"
+    },
+    {
+      "target": "_p",
+      "when": "(sender_tenure_months < 1) and (amount_usd > 500)",
+      "expr": "_p + 0.28"
+    },
+    {
+      "target": "_p",
+      "when": "(is_weekend == 1) and (merchant_category == 'Online') and (amount_usd > 500)",
+      "expr": "_p + 0.18"
+    },
+    {
+      "target": "_p",
+      "when": "flagged_suspicious == 1",
+      "expr": "_p + 0.75"
+    },
+    {
+      "target": "_p",
+      "expr": "clip(_p, 0.005, 0.98)"
+    },
+    {
+      "target": "fraud",
+      "expr": "_u < _p"
+    }
+  ]
+}

@@ -1,12 +1,16 @@
 """
 NOVA FastAPI backend.
 
-Endpoints:
-    GET  /api/health    -> liveness + whether a model is loaded
-    GET  /api/status    -> model metadata (epochs, columns, target, device)
-    POST /api/generate  -> CSV (optional) + num_rows + default_rate
-                           => synthetic preview, full CSV, validation metrics
-    GET  /api/sample    -> download the bundled ground-truth CSV to try the app
+Mode 1 (Copy) — learn from real data, generate more:
+    GET  /api/health            -> liveness + whether a model is loaded
+    GET  /api/status            -> model metadata (epochs, columns, target, device)
+    POST /api/generate          -> CSV (optional) + num_rows + default_rate
+    GET  /api/sample            -> download the bundled ground-truth CSV
+
+Mode 2 (Create) — generate from domain knowledge alone, no dataset:
+    GET  /api/presets           -> list the financial-domain criteria presets
+    GET  /api/preset/{id}       -> full criteria spec for one preset
+    POST /api/generate-criteria -> spec (or preset_id) + num_rows => synthetic data
 """
 
 from __future__ import annotations
@@ -18,13 +22,17 @@ import pandas as pd
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse
+from pydantic import BaseModel
 
-from .service import DEFAULT_CSV, SynthFinService
+from synthfin.criteria import CriteriaError, generate_from_criteria, validate_spec
+from synthfin.presets import get_preset, list_presets
+
+from .service import DEFAULT_CSV, MAX_ROWS, SynthFinService
 
 app = FastAPI(
     title="NOVA API",
-    version="1.0.0",
-    description="Privacy-safe synthetic financial data for West African microfinance.",
+    version="2.0.0",
+    description="Universal synthetic financial data — Copy (CTGAN) and Create (criteria engine).",
 )
 
 origins = os.environ.get("CORS_ORIGINS", "*").split(",")
@@ -95,6 +103,59 @@ async def generate(
         raise HTTPException(500, f"Generation failed: {exc}")
 
 
+# --------------------------------------------------------------------------- #
+# Mode 2: Create (criteria engine — no dataset required)
+# --------------------------------------------------------------------------- #
+class CriteriaRequest(BaseModel):
+    preset_id: str | None = None
+    spec: dict | None = None
+    num_rows: int = 10000
+    seed: int = 0
+
+
+@app.get("/api/presets")
+def presets():
+    return {"presets": list_presets()}
+
+
+@app.get("/api/preset/{preset_id}")
+def preset(preset_id: str):
+    spec = get_preset(preset_id)
+    if spec is None:
+        raise HTTPException(404, f"Unknown preset: {preset_id!r}")
+    return spec
+
+
+@app.post("/api/generate-criteria")
+def generate_criteria(req: CriteriaRequest):
+    spec = get_preset(req.preset_id) if req.preset_id else req.spec
+    if spec is None:
+        raise HTTPException(422, "Provide a known 'preset_id' or a custom 'spec'.")
+    problems = validate_spec(spec)
+    if problems:
+        raise HTTPException(422, "; ".join(problems))
+
+    n = max(1, min(int(req.num_rows), MAX_ROWS))
+    try:
+        df, report = generate_from_criteria(spec, n_rows=n, seed=req.seed)
+    except CriteriaError as exc:
+        raise HTTPException(422, str(exc))
+    except Exception as exc:  # noqa: BLE001
+        raise HTTPException(500, f"Criteria generation failed: {exc}")
+
+    return {
+        "mode": "create",
+        "spec_name": spec.get("name", spec.get("id")),
+        "domain": spec.get("domain"),
+        "num_rows": int(len(df)),
+        "columns": list(df.columns),
+        "preview": df.head(10).to_dict(orient="records"),
+        "report": report,
+        "csv": df.to_csv(index=False),
+    }
+
+
 @app.get("/")
 def root():
-    return {"name": "NOVA API", "docs": "/docs", "health": "/api/health"}
+    return {"name": "NOVA API", "version": "2.0.0", "modes": ["copy", "create"],
+            "docs": "/docs", "health": "/api/health"}

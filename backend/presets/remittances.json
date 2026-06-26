@@ -1,0 +1,194 @@
+{
+  "id": "remittances",
+  "name": "Remittances \u2014 Cross-border Transfers",
+  "description": "Diaspora money-transfer records for economic and corridor analysis.",
+  "domain": "Remittances",
+  "target": null,
+  "columns": [
+    {
+      "name": "transaction_id",
+      "type": "id",
+      "dist": {
+        "dist": "uuid"
+      }
+    },
+    {
+      "name": "sender_country",
+      "type": "categorical",
+      "dist": {
+        "dist": "categorical",
+        "values": [
+          "US",
+          "UK",
+          "Spain",
+          "France",
+          "Italy",
+          "Canada",
+          "Germany"
+        ]
+      }
+    },
+    {
+      "name": "receiver_country",
+      "type": "categorical",
+      "dist": {
+        "dist": "categorical",
+        "values": [
+          "Gambia",
+          "Senegal",
+          "Nigeria",
+          "Ghana"
+        ],
+        "weights": [
+          0.3,
+          0.25,
+          0.25,
+          0.2
+        ]
+      }
+    },
+    {
+      "name": "amount_usd",
+      "type": "continuous",
+      "dist": {
+        "dist": "gamma",
+        "shape": 2,
+        "scale": 250
+      },
+      "min": 10,
+      "max": 5000
+    },
+    {
+      "name": "transfer_channel",
+      "type": "categorical",
+      "dist": {
+        "dist": "categorical",
+        "values": [
+          "Bank",
+          "Mobile",
+          "Fintech",
+          "Western Union"
+        ],
+        "weights": [
+          0.25,
+          0.3,
+          0.25,
+          0.2
+        ]
+      }
+    },
+    {
+      "name": "transfer_purpose",
+      "type": "categorical",
+      "dist": {
+        "dist": "categorical",
+        "values": [
+          "Family Support",
+          "Savings",
+          "Education",
+          "Health",
+          "Business"
+        ],
+        "weights": [
+          0.45,
+          0.15,
+          0.15,
+          0.1,
+          0.15
+        ]
+      }
+    },
+    {
+      "name": "transfer_frequency",
+      "type": "count",
+      "dist": {
+        "dist": "poisson",
+        "lam": 4
+      },
+      "min": 1,
+      "max": 30
+    },
+    {
+      "name": "exchange_rate",
+      "type": "continuous",
+      "dist": {
+        "dist": "normal",
+        "mu": 550,
+        "sigma": 50
+      },
+      "min": 300,
+      "max": 900
+    },
+    {
+      "name": "sender_gender",
+      "type": "categorical",
+      "dist": {
+        "dist": "categorical",
+        "values": [
+          "Male",
+          "Female"
+        ],
+        "weights": [
+          0.55,
+          0.45
+        ]
+      }
+    },
+    {
+      "name": "is_weekend",
+      "type": "binary",
+      "dist": {
+        "dist": "bernoulli",
+        "p": 0.28
+      }
+    },
+    {
+      "name": "fee_usd",
+      "type": "continuous",
+      "dist": {
+        "dist": "derived"
+      }
+    },
+    {
+      "name": "remittance_growth",
+      "type": "continuous",
+      "dist": {
+        "dist": "normal",
+        "mu": 5,
+        "sigma": 2
+      },
+      "min": -5,
+      "max": 20
+    }
+  ],
+  "rules": [
+    {
+      "target": "amount_usd",
+      "when": "transfer_purpose == 'Family Support'",
+      "expr": "amount_usd * 0.7"
+    },
+    {
+      "target": "amount_usd",
+      "when": "transfer_purpose == 'Business'",
+      "expr": "amount_usd * 1.8"
+    },
+    {
+      "target": "amount_usd",
+      "expr": "clip(amount_usd * (1 - 0.02*transfer_frequency), 10, 5000)"
+    },
+    {
+      "target": "fee_usd",
+      "expr": "amount_usd * 0.05"
+    },
+    {
+      "target": "fee_usd",
+      "when": "transfer_channel == 'Mobile'",
+      "expr": "amount_usd * 0.02"
+    },
+    {
+      "target": "fee_usd",
+      "when": "transfer_channel == 'Western Union'",
+      "expr": "amount_usd * 0.08"
+    }
+  ]
+}

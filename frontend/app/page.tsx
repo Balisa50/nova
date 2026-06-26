@@ -7,6 +7,10 @@ const STATS = [
   { value: "$20B", label: "projected synthetic-data market by 2030", src: "MarketsandMarkets" },
 ];
 
+const DOMAINS = [
+  "Banking", "Payments / Fraud", "Insurance", "Remittances", "Macro", "Wealth", "Corporate",
+];
+
 const STEPS = [
   {
     n: "01",
@@ -46,10 +50,10 @@ export default function Home() {
         </h1>
         <p className="mt-8 max-w-2xl text-lg text-muted leading-relaxed">
           Sensitive customer data can&apos;t leave the building — so the models that could
-          widen financial inclusion in West Africa never get trained. NOVA breaks the
-          deadlock: a generative engine that produces{" "}
-          <span className="text-fg">privacy-safe, statistically identical</span> microfinance
-          data, on demand.
+          widen financial inclusion never get trained. NOVA breaks the deadlock two ways:{" "}
+          <span className="text-fg">create</span> realistic data from domain rules alone — no
+          dataset required — or <span className="text-fg">copy</span> a real one with a
+          from-scratch CTGAN. Both privacy-safe, both validated.
         </p>
         <div className="mt-10 flex flex-wrap items-center gap-5">
           <Link
@@ -84,6 +88,45 @@ export default function Home() {
               <div className="mt-2 text-xs font-mono text-faint">— {s.src}</div>
             </div>
           ))}
+        </div>
+      </section>
+
+      <div className="rule" />
+
+      {/* Two modes */}
+      <section className="py-16">
+        <h2 className="text-sm font-mono text-faint tracking-widest mb-10">
+          TWO WAYS TO MAKE DATA
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-line">
+          <div className="bg-bg pr-0 md:pr-10 py-2">
+            <div className="h-1 w-10 bg-accent mb-4" />
+            <h3 className="text-2xl font-medium">
+              Create <span className="text-faint text-lg">— from nothing</span>
+            </h3>
+            <p className="mt-3 text-muted leading-relaxed">
+              Define columns, distributions and domain rules — &ldquo;rural schools score
+              lower&rdquo;, &ldquo;new account + big international transfer ⇒ likely fraud&rdquo;.
+              NOVA applies your knowledge to generate brand-new data with no source dataset. Comes
+              with presets for seven financial domains, or define your own.
+            </p>
+            <div className="mt-5 flex flex-wrap gap-x-4 gap-y-1.5 font-mono text-xs text-faint">
+              {DOMAINS.map((d) => (
+                <span key={d}>{d}</span>
+              ))}
+            </div>
+          </div>
+          <div className="bg-bg md:pl-10 py-2">
+            <div className="h-1 w-10 bg-accent mb-4" />
+            <h3 className="text-2xl font-medium">
+              Copy <span className="text-faint text-lg">— from real data</span>
+            </h3>
+            <p className="mt-3 text-muted leading-relaxed">
+              Upload a CSV and a Conditional Tabular GAN, built from scratch in PyTorch, learns its
+              joint distribution and generates statistically identical, privacy-safe rows. Every
+              batch is scored on four independent metrics before you trust it.
+            </p>
+          </div>
         </div>
       </section>
 

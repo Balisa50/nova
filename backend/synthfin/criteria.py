@@ -44,6 +44,11 @@ _ALLOWED_FUNCS = {
     "floor": np.floor,
     "ceil": np.ceil,
     "isin": lambda x, vals: np.isin(x, list(vals)),
+    # Case-insensitive substring test, for text-column rules ("contains").
+    "contains": lambda arr, sub: np.array(
+        [str(sub).lower() in str(v).lower() for v in np.asarray(arr, dtype=object).ravel()],
+        dtype=bool,
+    ),
 }
 
 _BINOPS = {
@@ -196,9 +201,14 @@ def sample_distribution(spec: dict, n: int, rng: np.random.Generator):
 # --------------------------------------------------------------------------- #
 # Generation
 # --------------------------------------------------------------------------- #
+# Columns whose values are text/labels rather than numbers. They are held as
+# object arrays so rules can assign strings of any length without truncation.
+_STRING_TYPES = ("categorical", "string", "id", "text")
+
+
 def _init_value(col: dict):
     t = col.get("type", "continuous")
-    if t in ("categorical", "string", "id"):
+    if t in _STRING_TYPES:
         return ""
     return 0.0
 
@@ -215,13 +225,16 @@ def generate_from_criteria(spec: dict, n_rows: int = 10000, seed: int = 0) -> tu
     if len(set(names)) != len(names):
         raise CriteriaError("Duplicate column names in spec.")
 
-    # 1) sample base distributions / initialise derived columns
+    # 1) sample base distributions / initialise derived columns. String-like
+    # columns are always object arrays so rules may assign arbitrary strings.
     env: dict[str, Any] = {}
     for col in columns:
+        is_str = col.get("type") in _STRING_TYPES
         sampled = sample_distribution(col.get("dist", {"dist": "derived"}), n, rng)
-        env[col["name"]] = (np.full(n, _init_value(col), dtype=object)
-                            if sampled is None and col.get("type") in ("categorical", "string", "id")
-                            else (np.full(n, _init_value(col)) if sampled is None else sampled))
+        if sampled is None:
+            env[col["name"]] = np.full(n, _init_value(col), dtype=object if is_str else None)
+        else:
+            env[col["name"]] = np.asarray(sampled, dtype=object) if is_str else sampled
 
     # 2) apply rules in order
     for i, rule in enumerate(spec.get("rules", [])):
@@ -273,6 +286,13 @@ def generate_from_criteria(spec: dict, n_rows: int = 10000, seed: int = 0) -> tu
             v = (np.asarray(v, dtype=float) >= 0.5).astype("int64")
             out[name] = v
             report_cols[name] = {"rate": float(v.mean())}
+        elif t == "datetime":
+            # Stored/sampled as epoch-days (days since 1970-01-01); emit ISO dates.
+            days = np.asarray(v, dtype=float)
+            if "min" in col or "max" in col:
+                days = np.clip(days, col.get("min", -np.inf), col.get("max", np.inf))
+            dates = pd.to_datetime(np.round(days), unit="D")
+            out[name] = np.asarray(dates.strftime("%Y-%m-%d"), dtype=object)
         else:  # categorical / id / string
             out[name] = v.astype(object)
         if t in ("continuous", "integer", "count"):

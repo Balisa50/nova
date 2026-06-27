@@ -7,7 +7,7 @@ const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "NOVA — Synthetic financial data for West Africa",
+  title: "NOVA: Synthetic financial data for West Africa",
   description:
     "A Conditional Tabular GAN, built from scratch, that generates privacy-safe, statistically faithful microfinance data for West African fintech.",
 };
@@ -45,7 +45,7 @@ function Footer() {
   return (
     <footer className="border-t border-line mt-24">
       <div className="mx-auto max-w-6xl px-6 py-10 flex flex-col sm:flex-row gap-4 justify-between text-sm text-faint">
-        <span>Built by Abdoulie Balisa — research portfolio.</span>
+        <span>Built by Abdoulie Balisa</span>
         <span className="flex gap-5">
           <a href="https://github.com/Balisa50/nova" className="hover:text-fg no-underline">
             GitHub

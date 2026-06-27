@@ -77,7 +77,7 @@ export function MetricsDashboard({ report }: { report: ValidationReport }) {
     },
     {
       title: "Can you train on it?",
-      head: tstr ? tstr.performance_ratio.toFixed(2) : "—",
+      head: tstr ? tstr.performance_ratio.toFixed(2) : "n/a",
       sub: tstr
         ? "A model trained on this data, then tested on real data, reaches this share of real-data accuracy."
         : "This dataset has no yes/no outcome to test.",
@@ -88,7 +88,7 @@ export function MetricsDashboard({ report }: { report: ValidationReport }) {
     {
       title: "Is it private?",
       head: priv.median_dcr_ratio.toFixed(2),
-      sub: `How far synthetic records sit from real ones — ${(priv.duplicate_share * 100).toFixed(1)}% are near-copies.`,
+      sub: `How far synthetic records sit from real ones. ${(priv.duplicate_share * 100).toFixed(1)}% are near-copies.`,
       threshold: "higher is safer · good at 1.0 and up",
       score: privacyScore,
       pass: priv.pass,
@@ -148,7 +148,7 @@ export function MetricsDashboard({ report }: { report: ValidationReport }) {
           ))}
           <div className="py-4 text-xs text-faint">
             For reference: a detector can tell real from synthetic{" "}
-            {(dist.attack_accuracy * 100).toFixed(0)}% of the time — a quality gauge, not a privacy
+            {(dist.attack_accuracy * 100).toFixed(0)}% of the time. A quality gauge, not a privacy
             leak. Lower is better.
           </div>
         </div>

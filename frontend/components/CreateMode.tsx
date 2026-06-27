@@ -47,7 +47,7 @@ export function CreateMode() {
         setPresets(ps);
         if (ps.length) selectPreset(ps.find((p) => p.id === "loans")?.id ?? ps[0].id);
       })
-      .catch(() => setLoadErr("Can't reach NOVA right now — give it a few seconds and refresh."));
+      .catch(() => setLoadErr("Can't reach NOVA right now. Give it a few seconds and refresh."));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -73,7 +73,7 @@ export function CreateMode() {
       try {
         parsed = JSON.parse(specText);
       } catch {
-        throw new Error("Your custom definition isn't valid — check the editor.");
+        throw new Error("Your custom definition isn't valid. Check the editor.");
       }
       const res = await generateCriteria({ spec: parsed, num_rows: numRows, seed: useSeed });
       setResult(res);

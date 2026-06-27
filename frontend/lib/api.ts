@@ -90,7 +90,7 @@ export async function generate(form: FormData): Promise<GenerateResponse> {
 }
 
 // --------------------------------------------------------------------------- //
-// Mode 2: Create (criteria engine — generate from domain knowledge, no data)
+// Mode 2: Create (criteria engine: generate from domain knowledge, no data)
 // --------------------------------------------------------------------------- //
 export interface PresetSummary {
   id: string;

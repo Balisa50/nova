@@ -21,12 +21,12 @@ const STEPS = [
   {
     n: "01",
     t: "Describe what you need",
-    d: "Pick a domain — loans, transactions, insurance, or define your own — and tell NOVA the columns you want and the rules behind them, like “rural schools have lower pass rates”.",
+    d: "Pick a domain (loans, transactions, insurance, or define your own) and tell NOVA the columns you want and the rules behind them, like “rural schools have lower pass rates”.",
   },
   {
     n: "02",
     t: "Generate new data",
-    d: "NOVA creates brand-new records that follow your rules. No real data required — just domain knowledge. Or upload a file you already have and get a safe synthetic twin.",
+    d: "NOVA creates brand-new records that follow your rules. No real data required, just domain knowledge. Or upload a file you already have and get a safe synthetic twin.",
   },
   {
     n: "03",
@@ -36,7 +36,7 @@ const STEPS = [
   {
     n: "04",
     t: "Download and use",
-    d: "Get a CSV you can use straight away — for training, testing, or sharing — without exposing a single real customer.",
+    d: "Get a CSV you can use straight away, for training, testing, or sharing, without exposing a single real customer.",
   },
 ];
 
@@ -44,7 +44,7 @@ const CHECKS = [
   ["Does it look real?", "The shape and spread of every field matches reality."],
   ["Are the relationships right?", "Income still drives loan size; risk still drives default."],
   ["Can you actually use it?", "A model trained on it performs almost as well as on real data."],
-  ["Is it truly private?", "No record is a copy of — or traceable to — a real person."],
+  ["Is it truly private?", "No record is a copy of, or traceable to, a real person."],
 ];
 
 export default function Home() {
@@ -62,7 +62,7 @@ export default function Home() {
           Builders have <span className="text-accent">none</span>.
         </h1>
         <p className="mt-8 max-w-2xl text-lg text-muted leading-relaxed">
-          Sensitive customer data can’t leave the building — so the models that could widen
+          Sensitive customer data can’t leave the building, so the models that could widen
           financial inclusion in West Africa never get trained. NOVA breaks the deadlock: generate
           privacy-safe, realistic financial data on demand, from your own rules or from a file you
           already have.
@@ -93,7 +93,7 @@ export default function Home() {
             <div key={s.label}>
               <div className="text-5xl font-semibold tracking-tight tabular text-fg">{s.value}</div>
               <div className="mt-3 text-sm text-muted leading-snug">{s.label}</div>
-              <div className="mt-2 text-xs font-mono text-faint">— {s.src}</div>
+              <div className="mt-2 text-xs font-mono text-faint">{s.src}</div>
             </div>
           ))}
         </div>
@@ -108,10 +108,10 @@ export default function Home() {
           <div className="bg-bg pr-0 md:pr-10 py-2">
             <div className="h-1 w-10 bg-accent mb-4" />
             <h3 className="text-2xl font-medium">
-              Create <span className="text-faint text-lg">— from nothing</span>
+              Create <span className="text-faint text-lg">from nothing</span>
             </h3>
             <p className="mt-3 text-muted leading-relaxed">
-              Tell NOVA what you want — the columns, and the rules behind them, like “a brand-new
+              Tell NOVA what you want: the columns, and the rules behind them, like “a brand-new
               account making a large international transfer is likely fraud”. It builds realistic
               records from nothing. No dataset needed. Seven ready-made domains, or define your own.
             </p>
@@ -119,11 +119,11 @@ export default function Home() {
           <div className="bg-bg md:pl-10 py-2">
             <div className="h-1 w-10 bg-accent mb-4" />
             <h3 className="text-2xl font-medium">
-              Copy <span className="text-faint text-lg">— from real data</span>
+              Copy <span className="text-faint text-lg">from real data</span>
             </h3>
             <p className="mt-3 text-muted leading-relaxed">
-              Already have a real dataset? NOVA studies its patterns — the ranges, the
-              relationships, the unusual cases — and creates a brand-new set that behaves the same
+              Already have a real dataset? NOVA studies its patterns (the ranges, the
+              relationships, the unusual cases) and creates a brand-new set that behaves the same
               way, but belongs to no real person.
             </p>
           </div>

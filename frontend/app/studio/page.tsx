@@ -27,7 +27,7 @@ export default function Studio() {
   useEffect(() => {
     fetchStatus()
       .then(setStatus)
-      .catch(() => setStatusErr("Backend unreachable — start the FastAPI server."));
+      .catch(() => setStatusErr("Can’t reach the backend right now."));
   }, []);
 
   async function onGenerate() {
@@ -219,7 +219,7 @@ function ModelBadge({
   status: StatusResponse | null;
   statusErr: string | null;
 }) {
-  if (statusErr) return <span className="text-sm text-fail font-mono">● offline — try again shortly</span>;
+  if (statusErr) return <span className="text-sm text-fail font-mono">● offline, try again shortly</span>;
   if (!status) return <span className="text-sm text-faint font-mono">● waking up…</span>;
   return <span className="text-sm font-mono text-pass">● ready</span>;
 }

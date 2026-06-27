@@ -1,9 +1,14 @@
 {
   "id": "investment",
-  "name": "Investment \u2014 Portfolios & Returns",
-  "description": "Portfolio holdings for asset allocation and risk modelling.",
+  "name": "Investment \u2014 Portfolio Modeling",
+  "description": "Generate portfolio holdings and returns for asset allocation and risk modelling.",
   "domain": "Wealth",
   "target": "is_underwater",
+  "highlights": [
+    "Aggressive investors carry more volatility",
+    "Cash holdings barely move and return little",
+    "A portfolio is 'underwater' when its annual return is negative"
+  ],
   "columns": [
     {
       "name": "portfolio_id",

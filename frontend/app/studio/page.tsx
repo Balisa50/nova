@@ -59,7 +59,7 @@ export default function Studio() {
           <h1 className="text-4xl font-semibold tracking-tight">Generation studio</h1>
           <p className="mt-2 text-muted">
             Two ways to make data: <span className="text-fg">Create</span> from domain rules with no
-            dataset, or <span className="text-fg">Copy</span> a real CSV with the CTGAN.
+            dataset, or <span className="text-fg">Copy</span> a real dataset you already have.
           </p>
         </div>
         <ModelBadge status={status} statusErr={statusErr} />
@@ -187,8 +187,8 @@ function ModeToggle({
   setMode: (m: "create" | "copy") => void;
 }) {
   const tabs: { id: "create" | "copy"; label: string; sub: string }[] = [
-    { id: "create", label: "Create", sub: "from domain rules · no data" },
-    { id: "copy", label: "Copy", sub: "learn from a real CSV · CTGAN" },
+    { id: "create", label: "Create", sub: "from rules · no data needed" },
+    { id: "copy", label: "Copy", sub: "from a dataset you have" },
   ];
   return (
     <div className="mt-8 flex gap-px bg-line w-full sm:w-fit">
@@ -219,16 +219,9 @@ function ModelBadge({
   status: StatusResponse | null;
   statusErr: string | null;
 }) {
-  if (statusErr) return <span className="text-sm text-fail font-mono">● backend offline</span>;
-  if (!status) return <span className="text-sm text-faint font-mono">● connecting…</span>;
-  return (
-    <div className="text-right text-sm font-mono text-muted">
-      <span className="text-pass">● model loaded</span>
-      <div className="text-faint mt-1">
-        {status.n_columns} cols · {status.trained_epochs} epochs · {status.device}
-      </div>
-    </div>
-  );
+  if (statusErr) return <span className="text-sm text-fail font-mono">● offline — try again shortly</span>;
+  if (!status) return <span className="text-sm text-faint font-mono">● waking up…</span>;
+  return <span className="text-sm font-mono text-pass">● ready</span>;
 }
 
 function Progress() {
@@ -238,7 +231,7 @@ function Progress() {
       <div className="flex items-center gap-3 text-muted">
         <span className="block w-2.5 h-2.5 bg-accent live-dot" />
         <span className="font-mono text-sm">
-          Sampling from the generator and running 4 validation metrics…
+          Creating your data and checking it four ways…
         </span>
       </div>
     </div>

@@ -52,44 +52,44 @@ export function MetricsDashboard({ report }: { report: ValidationReport }) {
   const corrScore = clamp01(1 - corr.l1_diff);
 
   const radarData = [
-    { metric: "Similarity", score: clamp01(stat.mean_similarity) },
-    { metric: "Correlation", score: corrScore },
-    { metric: "TSTR", score: tstr ? clamp01(tstr.auc_ratio) : 0 },
-    { metric: "Privacy", score: privacyScore },
+    { metric: "Looks real", score: clamp01(stat.mean_similarity) },
+    { metric: "Relationships", score: corrScore },
+    { metric: "Usable", score: tstr ? clamp01(tstr.auc_ratio) : 0 },
+    { metric: "Private", score: privacyScore },
   ];
 
   const metrics = [
     {
-      title: "Statistical similarity",
-      head: stat.mean_similarity.toFixed(3),
-      sub: `mean column-shape fidelity · ${(stat.pass_rate * 100).toFixed(0)}% pass KS/Chi² p>0.05 at n=500`,
-      threshold: "target ≥ 0.90 mean similarity",
+      title: "Does it look real?",
+      head: stat.mean_similarity.toFixed(2),
+      sub: "How closely the shape of every field matches reality.",
+      threshold: "1.0 is identical · good at 0.90 and up",
       score: clamp01(stat.mean_similarity),
       pass: stat.overall_pass,
     },
     {
-      title: "Correlation preservation",
-      head: corr.l1_diff.toFixed(3),
-      sub: `L1 distance over the correlation matrix · max ${corr.max_diff.toFixed(2)}`,
-      threshold: "target < 0.10",
+      title: "Are the relationships right?",
+      head: corrScore.toFixed(2),
+      sub: "Whether links like income and loan size survived.",
+      threshold: "1.0 is a perfect match · good at 0.90 and up",
       score: corrScore,
       pass: corr.pass,
     },
     {
-      title: "TSTR utility",
-      head: tstr ? tstr.performance_ratio.toFixed(3) : "—",
+      title: "Can you train on it?",
+      head: tstr ? tstr.performance_ratio.toFixed(2) : "—",
       sub: tstr
-        ? `train-on-synthetic accuracy ratio · AUC ratio ${tstr.auc_ratio.toFixed(2)} (synth AUC ${tstr.synth_auc.toFixed(2)})`
-        : "no target column detected",
-      threshold: "target ≥ 0.90",
+        ? "A model trained on this data, then tested on real data, reaches this share of real-data accuracy."
+        : "This dataset has no yes/no outcome to test.",
+      threshold: "good at 0.90 and up",
       score: tstr ? clamp01(tstr.performance_ratio) : 0,
       pass: tstr ? tstr.pass : true,
     },
     {
-      title: "Privacy (distance to closest record)",
-      head: priv.median_dcr_ratio.toFixed(3),
-      sub: `synthetic-vs-real nearest-neighbour ratio · ${(priv.duplicate_share * 100).toFixed(1)}% near-duplicates · ≥1.0 means no memorisation`,
-      threshold: "target ≥ 0.90 ratio, ≤ 5% duplicates",
+      title: "Is it private?",
+      head: priv.median_dcr_ratio.toFixed(2),
+      sub: `How far synthetic records sit from real ones — ${(priv.duplicate_share * 100).toFixed(1)}% are near-copies.`,
+      threshold: "higher is safer · good at 1.0 and up",
       score: privacyScore,
       pass: priv.pass,
     },
@@ -106,7 +106,7 @@ export function MetricsDashboard({ report }: { report: ValidationReport }) {
               {report.overall.passed}
               <span className="text-muted">/{report.overall.total}</span>
             </span>
-            <span className="text-muted">metrics passed</span>
+            <span className="text-muted">checks passed</span>
           </div>
           <div className="h-56 mt-4">
             <ResponsiveContainer width="100%" height="100%">
@@ -146,10 +146,10 @@ export function MetricsDashboard({ report }: { report: ValidationReport }) {
               <div className="text-xs font-mono text-faint mt-2">{m.threshold}</div>
             </div>
           ))}
-          <div className="py-4 text-xs font-mono text-faint">
-            diagnostic · real-vs-synthetic detection accuracy{" "}
-            {dist.attack_accuracy.toFixed(3)} (fidelity gap, not a privacy leak —
-            lower is better)
+          <div className="py-4 text-xs text-faint">
+            For reference: a detector can tell real from synthetic{" "}
+            {(dist.attack_accuracy * 100).toFixed(0)}% of the time — a quality gauge, not a privacy
+            leak. Lower is better.
           </div>
         </div>
       </div>

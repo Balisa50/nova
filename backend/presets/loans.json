@@ -1,9 +1,16 @@
 {
   "id": "loans",
-  "name": "Banking \u2014 Microfinance Loans",
-  "description": "Credit/loan records for credit scoring and default-risk modelling.",
+  "name": "Loans \u2014 Credit Scoring",
+  "description": "Generate loan applications with believable default patterns, for credit scoring and risk models.",
   "domain": "Banking",
   "target": "default",
+  "highlights": [
+    "Starting default rate: 25%",
+    "Collateral lowers default risk",
+    "Group lending lowers default risk",
+    "A history of defaults raises risk sharply",
+    "Higher interest rates and lower income raise risk"
+  ],
   "columns": [
     {
       "name": "borrower_id",

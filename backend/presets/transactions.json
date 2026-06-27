@@ -1,9 +1,16 @@
 {
   "id": "transactions",
   "name": "Transactions \u2014 Fraud Detection",
-  "description": "Payment/transfer records for fraud and AML modelling (~2-5% fraud).",
+  "description": "Generate payment data to train fraud-detection models, with realistic suspicious activity.",
   "domain": "Payments",
   "target": "fraud",
+  "highlights": [
+    "Base fraud rate: 2%",
+    "International payments over $800 -> much higher risk",
+    "Brand-new accounts making large transfers -> higher risk",
+    "Weekend online purchases over $500 -> higher risk",
+    "Anything already flagged suspicious -> very high risk"
+  ],
   "columns": [
     {
       "name": "transaction_id",

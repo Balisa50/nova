@@ -1,9 +1,14 @@
 {
   "id": "corporate",
   "name": "Corporate \u2014 Financial Statements",
-  "description": "Company financials for credit analysis and valuation.",
+  "description": "Generate company financials for credit analysis and valuation.",
   "domain": "Corporate",
   "target": null,
+  "highlights": [
+    "Net income follows revenue and operating margin",
+    "Equity = assets minus liabilities",
+    "Debt-to-equity and a health score derive from the statements"
+  ],
   "columns": [
     {
       "name": "company_id",

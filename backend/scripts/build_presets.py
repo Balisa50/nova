@@ -38,9 +38,16 @@ def cat(values, weights=None):
 
 # --------------------------------------------------------------------------- #
 LOANS = {
-    "id": "loans", "name": "Banking — Microfinance Loans",
-    "description": "Credit/loan records for credit scoring and default-risk modelling.",
+    "id": "loans", "name": "Loans — Credit Scoring",
+    "description": "Generate loan applications with believable default patterns, for credit scoring and risk models.",
     "domain": "Banking", "target": "default",
+    "highlights": [
+        "Starting default rate: 25%",
+        "Collateral lowers default risk",
+        "Group lending lowers default risk",
+        "A history of defaults raises risk sharply",
+        "Higher interest rates and lower income raise risk",
+    ],
     "columns": [
         C("borrower_id", "id", {"dist": "uuid"}),
         C("age", "integer", {"dist": "normal", "mu": 35, "sigma": 12}, min=18, max=75),
@@ -75,8 +82,15 @@ LOANS = {
 
 TRANSACTIONS = {
     "id": "transactions", "name": "Transactions — Fraud Detection",
-    "description": "Payment/transfer records for fraud and AML modelling (~2-5% fraud).",
+    "description": "Generate payment data to train fraud-detection models, with realistic suspicious activity.",
     "domain": "Payments", "target": "fraud",
+    "highlights": [
+        "Base fraud rate: 2%",
+        "International payments over $800 -> much higher risk",
+        "Brand-new accounts making large transfers -> higher risk",
+        "Weekend online purchases over $500 -> higher risk",
+        "Anything already flagged suspicious -> very high risk",
+    ],
     "columns": [
         C("transaction_id", "id", {"dist": "uuid"}),
         C("user_id", "id", {"dist": "uuid"}),
@@ -105,9 +119,16 @@ TRANSACTIONS = {
 }
 
 INSURANCE = {
-    "id": "insurance", "name": "Insurance — Claims & Actuarial",
-    "description": "Policy/claims records for actuarial pricing and risk modelling.",
+    "id": "insurance", "name": "Insurance — Actuarial Modeling",
+    "description": "Generate policy and claims data for pricing and risk analysis.",
     "domain": "Insurance", "target": "claim",
+    "highlights": [
+        "Base claim rate: 8%",
+        "High-risk occupations claim more",
+        "Smokers on health policies claim more",
+        "A previous claim strongly predicts the next",
+        "Higher BMI and older age raise claim rates",
+    ],
     "columns": [
         C("policy_id", "id", {"dist": "uuid"}),
         C("insured_age", "integer", {"dist": "normal", "mu": 45, "sigma": 15}, min=18, max=90),
@@ -139,9 +160,15 @@ INSURANCE = {
 }
 
 REMITTANCES = {
-    "id": "remittances", "name": "Remittances — Cross-border Transfers",
-    "description": "Diaspora money-transfer records for economic and corridor analysis.",
+    "id": "remittances", "name": "Remittances — Economic Analysis",
+    "description": "Generate cross-border transfer data for economic and corridor research.",
     "domain": "Remittances", "target": None,
+    "highlights": [
+        "Family-support transfers are smaller and frequent",
+        "Business transfers are larger and rarer",
+        "Frequent senders send smaller amounts",
+        "Mobile is the cheapest channel; Western Union the priciest",
+    ],
     "columns": [
         C("transaction_id", "id", {"dist": "uuid"}),
         C("sender_country", "categorical", cat(["US", "UK", "Spain", "France", "Italy", "Canada", "Germany"])),
@@ -168,8 +195,13 @@ REMITTANCES = {
 
 MACRO = {
     "id": "macro", "name": "Macro — Economic Indicators",
-    "description": "Quarterly macroeconomic indicators for policy and regulatory analysis.",
+    "description": "Generate country-level economic indicators for forecasting and policy work.",
     "domain": "Macro", "target": None,
+    "highlights": [
+        "GDP growth drifts down slightly over time",
+        "Interest rates track inflation, with a spread",
+        "Every indicator stays within realistic country ranges",
+    ],
     "columns": [
         C("indicator_id", "id", {"dist": "uuid"}),
         C("country", "categorical", cat(["Gambia", "Senegal", "Nigeria", "Ghana", "Mali", "Guinea"])),
@@ -192,9 +224,14 @@ MACRO = {
 }
 
 INVESTMENT = {
-    "id": "investment", "name": "Investment — Portfolios & Returns",
-    "description": "Portfolio holdings for asset allocation and risk modelling.",
+    "id": "investment", "name": "Investment — Portfolio Modeling",
+    "description": "Generate portfolio holdings and returns for asset allocation and risk modelling.",
     "domain": "Wealth", "target": "is_underwater",
+    "highlights": [
+        "Aggressive investors carry more volatility",
+        "Cash holdings barely move and return little",
+        "A portfolio is 'underwater' when its annual return is negative",
+    ],
     "columns": [
         C("portfolio_id", "id", {"dist": "uuid"}),
         C("investor_age", "integer", {"dist": "normal", "mu": 50, "sigma": 15}, min=18, max=90),
@@ -221,8 +258,13 @@ INVESTMENT = {
 
 CORPORATE = {
     "id": "corporate", "name": "Corporate — Financial Statements",
-    "description": "Company financials for credit analysis and valuation.",
+    "description": "Generate company financials for credit analysis and valuation.",
     "domain": "Corporate", "target": None,
+    "highlights": [
+        "Net income follows revenue and operating margin",
+        "Equity = assets minus liabilities",
+        "Debt-to-equity and a health score derive from the statements",
+    ],
     "columns": [
         C("company_id", "id", {"dist": "uuid"}),
         C("industry", "categorical", cat(["Agriculture", "Manufacturing", "Retail", "Technology", "Finance", "Services"])),

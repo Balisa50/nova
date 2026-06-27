@@ -1,9 +1,14 @@
 {
   "id": "macro",
   "name": "Macro \u2014 Economic Indicators",
-  "description": "Quarterly macroeconomic indicators for policy and regulatory analysis.",
+  "description": "Generate country-level economic indicators for forecasting and policy work.",
   "domain": "Macro",
   "target": null,
+  "highlights": [
+    "GDP growth drifts down slightly over time",
+    "Interest rates track inflation, with a spread",
+    "Every indicator stays within realistic country ranges"
+  ],
   "columns": [
     {
       "name": "indicator_id",

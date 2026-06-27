@@ -122,6 +122,7 @@ export interface CriteriaSpec {
   description?: string;
   domain?: string;
   target?: string | null;
+  highlights?: string[];
   columns: ColumnSpec[];
   rules?: RuleSpec[];
 }

@@ -1,9 +1,16 @@
 {
   "id": "insurance",
-  "name": "Insurance \u2014 Claims & Actuarial",
-  "description": "Policy/claims records for actuarial pricing and risk modelling.",
+  "name": "Insurance \u2014 Actuarial Modeling",
+  "description": "Generate policy and claims data for pricing and risk analysis.",
   "domain": "Insurance",
   "target": "claim",
+  "highlights": [
+    "Base claim rate: 8%",
+    "High-risk occupations claim more",
+    "Smokers on health policies claim more",
+    "A previous claim strongly predicts the next",
+    "Higher BMI and older age raise claim rates"
+  ],
   "columns": [
     {
       "name": "policy_id",

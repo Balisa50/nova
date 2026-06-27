@@ -1,9 +1,15 @@
 {
   "id": "remittances",
-  "name": "Remittances \u2014 Cross-border Transfers",
-  "description": "Diaspora money-transfer records for economic and corridor analysis.",
+  "name": "Remittances \u2014 Economic Analysis",
+  "description": "Generate cross-border transfer data for economic and corridor research.",
   "domain": "Remittances",
   "target": null,
+  "highlights": [
+    "Family-support transfers are smaller and frequent",
+    "Business transfers are larger and rarer",
+    "Frequent senders send smaller amounts",
+    "Mobile is the cheapest channel; Western Union the priciest"
+  ],
   "columns": [
     {
       "name": "transaction_id",

@@ -45,10 +45,18 @@ function Footer() {
   return (
     <footer className="border-t border-line mt-24">
       <div className="mx-auto max-w-6xl px-6 py-10 flex flex-col sm:flex-row gap-4 justify-between text-sm text-faint">
-        <span className="font-mono">
-          NOVA · CTGAN from scratch · PyTorch · FastAPI · Next.js
-        </span>
         <span>Built by Abdoulie Balisa — research portfolio.</span>
+        <span className="flex gap-5">
+          <a href="https://github.com/Balisa50/nova" className="hover:text-fg no-underline">
+            GitHub
+          </a>
+          <a
+            href="https://balisa50.github.io/projects/nova"
+            className="hover:text-fg no-underline"
+          >
+            Case study
+          </a>
+        </span>
       </div>
     </footer>
   );

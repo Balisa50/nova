@@ -2,6 +2,17 @@
 
 import type { GenerateResponse } from "@/lib/api";
 
+// Display-only tidy-up of machine column names (the CSV keeps the real names).
+const ACRONYMS: Record<string, string> = {
+  usd: "USD", apr: "APR", id: "ID", bmi: "BMI", roe: "ROE", gdp: "GDP", pct: "%",
+};
+function prettyCol(name: string): string {
+  return name
+    .split("_")
+    .map((w) => ACRONYMS[w] ?? w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+}
+
 export function DataPreview({ result }: { result: GenerateResponse }) {
   const cols = result.columns;
   const rows = result.preview;
@@ -11,7 +22,7 @@ export function DataPreview({ result }: { result: GenerateResponse }) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `synthfin_${result.num_rows}rows.csv`;
+    a.download = `nova_${result.num_rows}rows.csv`;
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -36,9 +47,9 @@ export function DataPreview({ result }: { result: GenerateResponse }) {
               {cols.map((c) => (
                 <th
                   key={c}
-                  className="text-left font-mono text-faint font-normal px-3 py-2 whitespace-nowrap"
+                  className="text-left text-faint font-normal px-3 py-2 whitespace-nowrap"
                 >
-                  {c}
+                  {prettyCol(c)}
                 </th>
               ))}
             </tr>

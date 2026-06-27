@@ -1,15 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
-  fetchPreset,
-  fetchPresets,
   generateCriteria,
+  type ColumnSpec,
   type CriteriaResponse,
   type CriteriaSpec,
-  type PresetSummary,
 } from "@/lib/api";
 import { RuleBuilder } from "@/components/RuleBuilder";
+import { ColumnEditor } from "@/components/ColumnEditor";
+import { BUNDLED_PRESETS, CUSTOM_STARTER } from "@/lib/presetData";
 import {
   buildSpec,
   columnMeta,
@@ -20,6 +20,25 @@ import {
 } from "@/lib/rules";
 
 const ROW_PRESETS = [1000, 5000, 10000];
+
+const clone = <T,>(o: T): T => JSON.parse(JSON.stringify(o)) as T;
+
+// Built into the app, so the domain list + rule builder show instantly without
+// waiting on the (cold-prone) backend. Only "Create the data" calls the API.
+const DOMAINS: { id: string; name: string; description: string; spec: CriteriaSpec }[] = [
+  ...BUNDLED_PRESETS.map((s) => ({
+    id: s.id as string,
+    name: s.name as string,
+    description: s.description ?? "",
+    spec: s,
+  })),
+  {
+    id: "custom",
+    name: CUSTOM_STARTER.name as string,
+    description: CUSTOM_STARTER.description ?? "",
+    spec: CUSTOM_STARTER,
+  },
+];
 
 // Clean up machine column names for display only (the downloaded CSV keeps the
 // real names so the data stays usable for training).
@@ -35,15 +54,13 @@ function prettyCol(name: string): string {
 }
 
 export function CreateMode() {
-  const [presets, setPresets] = useState<PresetSummary[]>([]);
-  const [loadErr, setLoadErr] = useState<string | null>(null);
-
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [spec, setSpec] = useState<CriteriaSpec | null>(null);
-  const [specText, setSpecText] = useState("");
+  const [selectedId, setSelectedId] = useState<string>(DOMAINS[0].id);
+  const [spec, setSpec] = useState<CriteriaSpec>(() => clone(DOMAINS[0].spec));
+  const [specText, setSpecText] = useState(() => JSON.stringify(DOMAINS[0].spec, null, 2));
   const [tab, setTab] = useState<"visual" | "json">("visual");
-  const [items, setItems] = useState<Item[]>([]);
-  const [cols, setCols] = useState<ColMeta[]>([]);
+  const [items, setItems] = useState<Item[]>(() => parseItems(DOMAINS[0].spec));
+  const [cols, setCols] = useState<ColMeta[]>(() => columnMeta(DOMAINS[0].spec));
+  const [showCols, setShowCols] = useState(false);
 
   const [numRows, setNumRows] = useState(5000);
   const [seed, setSeed] = useState(42);
@@ -52,34 +69,28 @@ export function CreateMode() {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<CriteriaResponse | null>(null);
 
-  useEffect(() => {
-    fetchPresets()
-      .then((ps) => {
-        setPresets(ps);
-        if (ps.length) selectPreset(ps.find((p) => p.id === "loans")?.id ?? ps[0].id);
-      })
-      .catch(() => setLoadErr("Can't reach NOVA right now. Give it a few seconds and refresh."));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  async function selectPreset(id: string) {
+  function selectDomain(id: string) {
+    const found = DOMAINS.find((d) => d.id === id) ?? DOMAINS[0];
+    const s = clone(found.spec);
     setSelectedId(id);
+    setSpec(s);
+    setCols(columnMeta(s));
+    setItems(parseItems(s));
+    setSpecText(JSON.stringify(s, null, 2));
+    setTab("visual");
+    setShowCols(id === "custom");
     setResult(null);
     setError(null);
-    setTab("visual");
-    try {
-      const s = await fetchPreset(id);
-      setSpec(s);
-      setCols(columnMeta(s));
-      setItems(parseItems(s));
-      setSpecText(JSON.stringify(s, null, 2));
-    } catch {
-      setError("Could not load that domain.");
-    }
+  }
+
+  function setColumns(newCols: ColumnSpec[]) {
+    const s = { ...spec, columns: newCols };
+    setSpec(s);
+    setCols(columnMeta(s));
   }
 
   function toJson() {
-    if (tab === "json" || !spec) return;
+    if (tab === "json") return;
     setSpecText(JSON.stringify(buildSpec(spec, items, cols), null, 2));
     setTab("json");
   }
@@ -99,7 +110,6 @@ export function CreateMode() {
 
   function currentSpec(): CriteriaSpec {
     if (tab === "json") return JSON.parse(specText); // may throw, caught in run()
-    if (!spec) throw new Error("Pick a domain first.");
     return buildSpec(spec, items, cols);
   }
 
@@ -126,8 +136,6 @@ export function CreateMode() {
     }
   }
 
-  if (loadErr) return <p className="text-sm text-fail font-mono mt-8">● {loadErr}</p>;
-
   const incomplete =
     tab === "visual" && items.some((it) => it.kind === "rule" && !ruleComplete(it.rule));
 
@@ -137,19 +145,22 @@ export function CreateMode() {
       <h2 className="text-sm font-mono text-faint tracking-widest mb-2">1 · WHAT DATA DO YOU NEED?</h2>
       <p className="text-sm text-muted mb-5">Pick a domain. NOVA already knows how each one behaves.</p>
       <div className="border-y border-line divide-y divide-line">
-        {presets.map((p) => {
+        {DOMAINS.map((p) => {
           const on = p.id === selectedId;
+          const custom = p.id === "custom";
           return (
             <button
               key={p.id}
-              onClick={() => selectPreset(p.id)}
+              onClick={() => selectDomain(p.id)}
               className="group flex w-full items-start gap-4 py-4 text-left"
             >
               <span
-                className={`mt-1 block h-3.5 w-3.5 shrink-0 rounded-full border ${
-                  on ? "border-accent bg-accent" : "border-line"
+                className={`mt-1 flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full border text-[10px] leading-none ${
+                  on ? "border-accent bg-accent text-bg" : "border-line text-faint"
                 }`}
-              />
+              >
+                {custom ? "+" : ""}
+              </span>
               <span className="min-w-0">
                 <span className={`block font-medium ${on ? "text-fg" : "text-muted group-hover:text-fg"}`}>
                   {p.name}
@@ -161,10 +172,25 @@ export function CreateMode() {
         })}
       </div>
 
-      {spec && (
-        <>
-          {/* rules */}
-          <h2 className="text-sm font-mono text-faint tracking-widest mt-12 mb-2">2 · THE RULES</h2>
+      {/* columns */}
+      <div className="mt-6">
+        <button
+          onClick={() => setShowCols((v) => !v)}
+          className="text-xs font-mono text-faint hover:text-accent"
+        >
+          {showCols
+            ? "▾ hide columns"
+            : `▸ ${selectedId === "custom" ? "Define your columns" : "Edit columns"} (${cols.length})`}
+        </button>
+        {showCols && (
+          <div className="mt-3">
+            <ColumnEditor columns={spec.columns} onChange={setColumns} />
+          </div>
+        )}
+      </div>
+
+      {/* rules */}
+      <h2 className="text-sm font-mono text-faint tracking-widest mt-12 mb-2">2 · THE RULES</h2>
           <p className="text-sm text-muted mb-5">
             These rules shape the data. Edit them, add your own by clicking, or switch to JSON. No code
             needed.
@@ -236,8 +262,6 @@ export function CreateMode() {
             <p className="mt-4 text-sm text-faint">Fill in every rule value to continue.</p>
           )}
           {error && <p className="mt-4 text-sm text-fail">{error}</p>}
-        </>
-      )}
 
       {result && (
         <CreateResults

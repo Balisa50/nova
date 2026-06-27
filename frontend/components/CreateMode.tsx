@@ -9,6 +9,15 @@ import {
   type CriteriaSpec,
   type PresetSummary,
 } from "@/lib/api";
+import { RuleBuilder } from "@/components/RuleBuilder";
+import {
+  buildSpec,
+  columnMeta,
+  parseItems,
+  ruleComplete,
+  type ColMeta,
+  type Item,
+} from "@/lib/rules";
 
 const ROW_PRESETS = [1000, 5000, 10000];
 
@@ -32,7 +41,9 @@ export function CreateMode() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [spec, setSpec] = useState<CriteriaSpec | null>(null);
   const [specText, setSpecText] = useState("");
-  const [showEditor, setShowEditor] = useState(false);
+  const [tab, setTab] = useState<"visual" | "json">("visual");
+  const [items, setItems] = useState<Item[]>([]);
+  const [cols, setCols] = useState<ColMeta[]>([]);
 
   const [numRows, setNumRows] = useState(5000);
   const [seed, setSeed] = useState(42);
@@ -55,27 +66,54 @@ export function CreateMode() {
     setSelectedId(id);
     setResult(null);
     setError(null);
-    setShowEditor(false);
+    setTab("visual");
     try {
       const s = await fetchPreset(id);
       setSpec(s);
+      setCols(columnMeta(s));
+      setItems(parseItems(s));
       setSpecText(JSON.stringify(s, null, 2));
     } catch {
       setError("Could not load that domain.");
     }
   }
 
+  function toJson() {
+    if (tab === "json" || !spec) return;
+    setSpecText(JSON.stringify(buildSpec(spec, items, cols), null, 2));
+    setTab("json");
+  }
+  function toVisual() {
+    if (tab === "visual") return;
+    try {
+      const p: CriteriaSpec = JSON.parse(specText);
+      setSpec(p);
+      setCols(columnMeta(p));
+      setItems(parseItems(p));
+      setError(null);
+      setTab("visual");
+    } catch {
+      setError("The JSON isn't valid. Fix it before switching back to visual.");
+    }
+  }
+
+  function currentSpec(): CriteriaSpec {
+    if (tab === "json") return JSON.parse(specText); // may throw, caught in run()
+    if (!spec) throw new Error("Pick a domain first.");
+    return buildSpec(spec, items, cols);
+  }
+
   async function run(useSeed: number) {
     setBusy(true);
     setError(null);
     try {
-      let parsed: CriteriaSpec;
+      let finalSpec: CriteriaSpec;
       try {
-        parsed = JSON.parse(specText);
+        finalSpec = currentSpec();
       } catch {
-        throw new Error("Your custom definition isn't valid. Check the editor.");
+        throw new Error("Your custom definition isn't valid. Check the JSON tab.");
       }
-      const res = await generateCriteria({ spec: parsed, num_rows: numRows, seed: useSeed });
+      const res = await generateCriteria({ spec: finalSpec, num_rows: numRows, seed: useSeed });
       setResult(res);
       setTimeout(
         () => document.getElementById("create-results")?.scrollIntoView({ behavior: "smooth" }),
@@ -89,6 +127,9 @@ export function CreateMode() {
   }
 
   if (loadErr) return <p className="text-sm text-fail font-mono mt-8">● {loadErr}</p>;
+
+  const incomplete =
+    tab === "visual" && items.some((it) => it.kind === "rule" && !ruleComplete(it.rule));
 
   return (
     <div>
@@ -122,40 +163,37 @@ export function CreateMode() {
 
       {spec && (
         <>
-          {/* plain-English rules */}
-          {spec.highlights && spec.highlights.length > 0 && (
-            <>
-              <h2 className="text-sm font-mono text-faint tracking-widest mt-12 mb-2">
-                2 · HOW THIS DATA BEHAVES
-              </h2>
-              <p className="text-sm text-muted mb-5">
-                NOVA follows these rules so the data looks real. Want to change them, or build a domain
-                of your own? Open the editor below.
-              </p>
-              <ul className="space-y-2.5">
-                {spec.highlights.map((h, i) => (
-                  <li key={i} className="flex items-start gap-3 text-[15px] text-muted">
-                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
-                    <span>{h}</span>
-                  </li>
-                ))}
-              </ul>
-            </>
-          )}
+          {/* rules */}
+          <h2 className="text-sm font-mono text-faint tracking-widest mt-12 mb-2">2 · THE RULES</h2>
+          <p className="text-sm text-muted mb-5">
+            These rules shape the data. Edit them, add your own by clicking, or switch to JSON. No code
+            needed.
+          </p>
 
-          <button
-            onClick={() => setShowEditor((v) => !v)}
-            className="mt-6 text-xs font-mono text-faint hover:text-accent underline underline-offset-4"
-          >
-            {showEditor ? "▾ hide advanced editor" : "▸ Define a custom domain (advanced)"}
-          </button>
-          {showEditor && (
+          <div className="flex gap-px bg-line w-fit mb-6">
+            <button
+              onClick={toVisual}
+              className={`px-5 py-2 text-sm bg-bg ${tab === "visual" ? "text-fg" : "text-muted hover:text-fg"}`}
+            >
+              Visual rules
+            </button>
+            <button
+              onClick={toJson}
+              className={`px-5 py-2 text-sm bg-bg ${tab === "json" ? "text-fg" : "text-muted hover:text-fg"}`}
+            >
+              JSON (advanced)
+            </button>
+          </div>
+
+          {tab === "visual" ? (
+            <RuleBuilder items={items} setItems={setItems} cols={cols} target={spec.target ?? undefined} />
+          ) : (
             <textarea
               value={specText}
               onChange={(e) => setSpecText(e.target.value)}
               spellCheck={false}
-              rows={16}
-              className="mt-3 w-full bg-surface border border-line p-3 font-mono text-xs text-muted outline-none focus:border-accent"
+              rows={18}
+              className="w-full bg-surface border border-line p-3 font-mono text-xs text-muted outline-none focus:border-accent"
             />
           )}
 
@@ -188,12 +226,15 @@ export function CreateMode() {
             </div>
             <button
               onClick={() => run(seed)}
-              disabled={busy}
-              className="bg-accent text-bg px-6 py-3 font-medium disabled:opacity-40 hover:opacity-90"
+              disabled={busy || incomplete}
+              className="bg-accent text-bg px-6 py-3 font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90"
             >
               {busy ? "Creating…" : "Create the data →"}
             </button>
           </div>
+          {incomplete && (
+            <p className="mt-4 text-sm text-faint">Fill in every rule value to continue.</p>
+          )}
           {error && <p className="mt-4 text-sm text-fail">{error}</p>}
         </>
       )}

@@ -2,27 +2,33 @@
 
 ---
 
-Banks in West Africa are sitting on the exact data that could widen financial inclusion — and they legally can't share a single row of it.
+I read that synthetic data generation is one of the hottest skills in data science right now.
 
-So the startups and researchers who could build credit and inclusion models have nothing to train on. Sensitive data stays locked in the building; innovation never starts.
+I also needed a project for my portfolio. Something AI, something that actually worked, something I could show.
 
-I built **NOVA** to break that deadlock.
+But I couldn't get real data from home. The Gambia doesn't have open datasets for finance, education, or health, at least not the kind you'd need for a serious project. So I started making data myself. Writing scripts, hard-coding rules, tweaking distributions by hand. It worked, but it was exhausting. Every new dataset meant rewriting everything from scratch, and I was spending more time generating data than building anything with it.
 
-It's a generative AI system that learns the statistical structure of a real microfinance loan book and produces brand-new, synthetic records — data that's statistically faithful, useful for ML, and traceable to no real person.
+So I built a tool that does it for me. It's called NOVA, and it has two modes.
 
-What I actually built, from first principles:
-→ A **Conditional Tabular GAN (CTGAN)** implemented from scratch in PyTorch — mode-specific normalization, a PacGAN critic, WGAN-GP loss, training-by-sampling. No model libraries.
-→ A **structural-causal ground-truth dataset** of 10,000 West African loans with realistic, verified correlations.
-→ A **four-metric validation suite** that proves quality instead of claiming it: statistical similarity, correlation preservation, train-on-synthetic-test-on-real (TSTR), and a privacy check via distance-to-closest-record.
-→ A **live web app** — Next.js + FastAPI — where you upload a CSV, generate, and download in three clicks.
+Mode 1 — Copy. You upload a CSV. NOVA learns the patterns (distributions, correlations, the way the columns actually move together) and generates more of the same. Under the hood it's a Conditional Tabular GAN, written from scratch in PyTorch. No model libraries, just the paper and the code.
 
-The results that matter:
-• TSTR — a model trained only on synthetic data reaches **92%** of real-data accuracy (94% by AUC).
-• Privacy — synthetic rows are no closer to real records than a fresh real sample is (DCR ratio 1.10; ~1% near-duplicates) → no memorisation.
-• Statistical fidelity 0.94, and correlation structure preserved at an L1 distance of 0.05.
+Mode 2 — Create. You define the columns, the rules, and the distributions, and NOVA generates data from that knowledge alone. No dataset required. I used this to generate 50,000 WASSCE student records for The Gambia from GBoS, UNESCO, and WAEC statistics. It took about ten seconds.
 
-The hardest — and most valuable — part wasn't the GAN. It was the honesty around it: building data you can trust, measuring what actually matters, and being explicit about every judgement call.
+I validated the copy mode on real West African loan data, the only set I could get my hands on. Four checks:
 
-Code is open source. If it helps one builder skip the cold-start data trap, it was worth it. 🔗 in comments.
+• Statistical similarity: 0.94
+• Correlation preservation: L1 difference of 0.05
+• Train on synthetic, test on real: 92% of real-data performance
+• Privacy: distance-to-closest-record ratio of 1.10, with only 1.1% near-duplicates
 
-#SyntheticData #AI #MachineLearning #Africa #Fintech #FinancialInclusion #GenerativeAI #DataScience #PyTorch
+All four passed.
+
+The app is live and open source: https://nova-gamma-eight.vercel.app
+
+It's not perfect. The backend goes to sleep after five minutes, so the first request is slow. The UI could be cleaner. But it works, and I learned more building the GAN from scratch than I ever would have from importing one.
+
+If you've ever stared at an empty dataset and wished you had something to work with, this is for you.
+
+Try it. Break it. Tell me what's wrong.
+
+#SyntheticData #DataScience #MachineLearning #PyTorch #Africa

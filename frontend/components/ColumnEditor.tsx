@@ -203,7 +203,17 @@ export function ColumnEditor({
   );
 }
 
-// Add category values one at a time; each shows as a removable chip.
+// Split a pasted blob into clean values. Handles commas, semicolons, new lines,
+// and tabs (so a spreadsheet column or row pastes cleanly). We deliberately do
+// NOT split on spaces — that would break multi-word values like "Greater Banjul".
+function parseList(raw: string): string[] {
+  return raw
+    .split(/[,;\n\r\t]+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+// Add category values: one at a time as chips, or paste a whole list at once.
 function CategoryValues({
   values,
   onChange,
@@ -212,50 +222,96 @@ function CategoryValues({
   onChange: (v: string[]) => void;
 }) {
   const [draft, setDraft] = useState("");
+  const [bulk, setBulk] = useState("");
 
-  function commit() {
-    const v = draft.trim();
-    if (!v || values.includes(v)) {
-      setDraft("");
-      return;
+  // Append the parsed tokens, skipping anything already present or repeated.
+  function addMany(raw: string) {
+    const seen = new Set(values);
+    const merged = [...values];
+    for (const v of parseList(raw)) {
+      if (!seen.has(v)) {
+        seen.add(v);
+        merged.push(v);
+      }
     }
-    onChange([...values, v]);
+    if (merged.length !== values.length) onChange(merged);
+  }
+  function commitDraft() {
+    addMany(draft);
     setDraft("");
+  }
+  function addBulk() {
+    addMany(bulk);
+    setBulk("");
   }
   function removeAt(idx: number) {
     onChange(values.filter((_, j) => j !== idx));
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-1.5">
-      {values.map((v, idx) => (
-        <span
-          key={`${v}-${idx}`}
-          className="inline-flex items-center gap-1 border border-line bg-surface px-2 py-0.5 text-xs text-fg"
-        >
-          {v}
-          <button
-            onClick={() => removeAt(idx)}
-            className="text-faint hover:text-fail leading-none"
-            aria-label={`remove ${v}`}
+    <div className="space-y-2">
+      <div className="flex flex-wrap items-center gap-1.5">
+        {values.map((v, idx) => (
+          <span
+            key={`${v}-${idx}`}
+            className="inline-flex items-center gap-1 border border-line bg-surface px-2 py-0.5 text-xs text-fg"
           >
-            ×
+            {v}
+            <button
+              onClick={() => removeAt(idx)}
+              className="text-faint hover:text-fail leading-none"
+              aria-label={`remove ${v}`}
+            >
+              ×
+            </button>
+          </span>
+        ))}
+        <input
+          value={draft}
+          placeholder="add value…"
+          onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === ",") {
+              e.preventDefault();
+              commitDraft();
+            }
+          }}
+          onBlur={commitDraft}
+          className="bg-surface border border-line px-2 py-1 w-28 text-fg outline-none focus:border-accent"
+        />
+      </div>
+
+      {/* Bulk paste — for 10+ values at once */}
+      <div>
+        <textarea
+          value={bulk}
+          onChange={(e) => setBulk(e.target.value)}
+          onKeyDown={(e) => {
+            // Cmd/Ctrl+Enter adds the list without leaving the keyboard.
+            if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+              e.preventDefault();
+              addBulk();
+            }
+          }}
+          placeholder="Paste a list — commas, new lines, or a spreadsheet column"
+          rows={2}
+          className="w-full min-w-[16rem] resize-y bg-surface border border-line px-2 py-1.5 text-xs text-fg outline-none focus:border-accent"
+        />
+        <div className="mt-1.5 flex items-center gap-3">
+          <button
+            onClick={addBulk}
+            disabled={!bulk.trim()}
+            className="border border-line px-2.5 py-1 text-xs text-muted hover:text-accent hover:border-accent disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            Add all →
           </button>
-        </span>
-      ))}
-      <input
-        value={draft}
-        placeholder="add value…"
-        onChange={(e) => setDraft(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === ",") {
-            e.preventDefault();
-            commit();
-          }
-        }}
-        onBlur={commit}
-        className="bg-surface border border-line px-2 py-1 w-28 text-fg outline-none focus:border-accent"
-      />
+          {values.length > 0 && (
+            <button onClick={() => onChange([])} className="text-xs text-faint hover:text-fail">
+              Clear all
+            </button>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

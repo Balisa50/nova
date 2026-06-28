@@ -267,7 +267,7 @@ export function CreateMode() {
           {incomplete && (
             <p className="mt-4 text-sm text-faint">Fill in every rule value to continue.</p>
           )}
-          {error && <p className="mt-4 text-sm text-fail">{error}</p>}
+          {error && <p className="mt-4 text-sm text-muted">{error}</p>}
         </>
       ) : (
         <p className="mt-6 text-sm text-faint">

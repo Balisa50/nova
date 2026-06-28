@@ -73,6 +73,20 @@ export interface StatusResponse {
   max_rows?: number;
 }
 
+// Calm, reassuring copy for the one thing that genuinely fails sometimes: the
+// free-tier backend waking from sleep. Never surface raw "fetch failed" / URLs.
+export const WARMING_MESSAGE =
+  "The engine is warming up — this can take a few seconds the first time. Please try again in a moment.";
+
+/** Best-effort nudge to wake a scale-to-zero backend (blocks until it boots). */
+async function wakeBackend(): Promise<void> {
+  try {
+    await fetch(`${BACKEND_URL}/api/status`, { cache: "no-store" });
+  } catch {
+    /* best effort */
+  }
+}
+
 export async function fetchStatus(): Promise<StatusResponse> {
   const res = await fetch(`${BACKEND_URL}/api/status`, { cache: "no-store" });
   if (!res.ok) throw new Error(`status ${res.status}`);
@@ -80,11 +94,12 @@ export async function fetchStatus(): Promise<StatusResponse> {
 }
 
 export async function generate(form: FormData): Promise<GenerateResponse> {
-  // Posts to the Next.js proxy route, which forwards to the backend.
+  // Posts to the Next.js proxy route, which forwards to the backend and already
+  // returns friendly messages (no raw errors / URLs).
   const res = await fetch("/api/generate", { method: "POST", body: form });
   if (!res.ok) {
     const detail = await res.json().catch(() => ({}));
-    throw new Error(detail?.error || `Generation failed (${res.status})`);
+    throw new Error(detail?.error || WARMING_MESSAGE);
   }
   return res.json();
 }
@@ -165,14 +180,33 @@ export async function generateCriteria(body: {
   num_rows: number;
   seed?: number;
 }): Promise<CriteriaResponse> {
-  const res = await fetch(`${BACKEND_URL}/api/generate-criteria`, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(body),
-  });
+  const send = () =>
+    fetch(`${BACKEND_URL}/api/generate-criteria`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(body),
+    });
+
+  let res: Response;
+  try {
+    res = await send();
+  } catch {
+    // A cold backend can drop the first connection. Wait for it to wake, retry once.
+    await wakeBackend();
+    try {
+      res = await send();
+    } catch {
+      throw new Error(WARMING_MESSAGE);
+    }
+  }
+
   if (!res.ok) {
-    const d = await res.json().catch(() => ({}));
-    throw new Error(d?.detail || `Generation failed (${res.status})`);
+    // 422 means the user's rules need a tweak; everything else is "warming up".
+    if (res.status === 422) {
+      const d = await res.json().catch(() => ({}));
+      throw new Error(d?.detail || "Please check your rule values and try again.");
+    }
+    throw new Error(WARMING_MESSAGE);
   }
   return res.json();
 }

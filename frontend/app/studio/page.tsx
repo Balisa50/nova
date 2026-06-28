@@ -5,7 +5,7 @@ import { UploadCSV } from "@/components/UploadCSV";
 import { MetricsDashboard } from "@/components/MetricsDashboard";
 import { DataPreview } from "@/components/DataPreview";
 import { CreateMode } from "@/components/CreateMode";
-import { fetchStatus, generate, type GenerateResponse, type StatusResponse } from "@/lib/api";
+import { fetchStatus, generate, WARMING_MESSAGE, type GenerateResponse, type StatusResponse } from "@/lib/api";
 
 const ROW_PRESETS = [1000, 5000, 10000];
 
@@ -13,7 +13,6 @@ export default function Studio() {
   const [mode, setMode] = useState<"create" | "copy">("create");
 
   const [status, setStatus] = useState<StatusResponse | null>(null);
-  const [statusErr, setStatusErr] = useState<string | null>(null);
 
   const [file, setFile] = useState<File | null>(null);
   const [numRows, setNumRows] = useState(5000);
@@ -25,9 +24,24 @@ export default function Studio() {
   const [result, setResult] = useState<GenerateResponse | null>(null);
 
   useEffect(() => {
-    fetchStatus()
-      .then(setStatus)
-      .catch(() => setStatusErr("Can’t reach the backend right now."));
+    let cancelled = false;
+    let tries = 0;
+    const check = () => {
+      fetchStatus()
+        .then((s) => {
+          if (!cancelled) setStatus(s);
+        })
+        .catch(() => {
+          // Quietly keep retrying while a cold backend boots — never alarm the user.
+          if (cancelled) return;
+          tries += 1;
+          if (tries < 12) setTimeout(check, 5000);
+        });
+    };
+    check();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   async function onGenerate() {
@@ -46,7 +60,7 @@ export default function Studio() {
         80
       );
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Something went wrong.");
+      setError(e instanceof Error ? e.message : WARMING_MESSAGE);
     } finally {
       setBusy(false);
     }
@@ -62,7 +76,7 @@ export default function Studio() {
             dataset, or <span className="text-fg">Copy</span> a real dataset you already have.
           </p>
         </div>
-        <ModelBadge status={status} statusErr={statusErr} />
+        <ModelBadge status={status} />
       </div>
 
       <ModeToggle mode={mode} setMode={setMode} />
@@ -138,12 +152,12 @@ export default function Studio() {
 
               <button
                 onClick={onGenerate}
-                disabled={busy || !!statusErr}
+                disabled={busy}
                 className="mt-8 w-full bg-accent text-bg py-3.5 font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90"
               >
                 {busy ? "Generating + validating…" : "Generate synthetic data →"}
               </button>
-              {error && <p className="mt-4 text-sm text-fail">{error}</p>}
+              {error && <p className="mt-4 text-sm text-muted">{error}</p>}
             </div>
           </div>
 
@@ -212,15 +226,9 @@ function ModeToggle({
   );
 }
 
-function ModelBadge({
-  status,
-  statusErr,
-}: {
-  status: StatusResponse | null;
-  statusErr: string | null;
-}) {
-  if (statusErr) return <span className="text-sm text-fail font-mono">● offline, try again shortly</span>;
-  if (!status) return <span className="text-sm text-faint font-mono">● waking up…</span>;
+function ModelBadge({ status }: { status: StatusResponse | null }) {
+  // Two calm states only — "ready" or "warming up". Never a red "offline".
+  if (!status) return <span className="text-sm text-faint font-mono">● warming up…</span>;
   return <span className="text-sm font-mono text-pass">● ready</span>;
 }
 

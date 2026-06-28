@@ -213,7 +213,9 @@ function parseList(raw: string): string[] {
     .filter(Boolean);
 }
 
-// Add category values: one at a time as chips, or paste a whole list at once.
+// One input for both single and bulk: type a value, or paste a whole list
+// (commas, new lines, semicolons, or a spreadsheet column) and it splits into
+// chips. Adds on paste, Enter, and blur. Duplicates are ignored.
 function CategoryValues({
   values,
   onChange,
@@ -222,7 +224,6 @@ function CategoryValues({
   onChange: (v: string[]) => void;
 }) {
   const [draft, setDraft] = useState("");
-  const [bulk, setBulk] = useState("");
 
   // Append the parsed tokens, skipping anything already present or repeated.
   function addMany(raw: string) {
@@ -236,20 +237,16 @@ function CategoryValues({
     }
     if (merged.length !== values.length) onChange(merged);
   }
-  function commitDraft() {
+  function commit() {
     addMany(draft);
     setDraft("");
-  }
-  function addBulk() {
-    addMany(bulk);
-    setBulk("");
   }
   function removeAt(idx: number) {
     onChange(values.filter((_, j) => j !== idx));
   }
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-1.5">
       <div className="flex flex-wrap items-center gap-1.5">
         {values.map((v, idx) => (
           <span
@@ -268,49 +265,44 @@ function CategoryValues({
         ))}
         <input
           value={draft}
-          placeholder="add value…"
+          placeholder="type or paste a list…"
           onChange={(e) => setDraft(e.target.value)}
+          onPaste={(e) => {
+            const text = e.clipboardData.getData("text");
+            // A pasted list (has a separator) splits straight into chips;
+            // a plain single word pastes normally so it stays editable.
+            if (/[,;\n\r\t]/.test(text)) {
+              e.preventDefault();
+              addMany(draft ? `${draft},${text}` : text);
+              setDraft("");
+            }
+          }}
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === ",") {
               e.preventDefault();
-              commitDraft();
+              commit();
             }
           }}
-          onBlur={commitDraft}
-          className="bg-surface border border-line px-2 py-1 w-28 text-fg outline-none focus:border-accent"
+          onBlur={commit}
+          className="min-w-[12rem] flex-1 bg-surface border border-line px-2 py-1 text-fg outline-none focus:border-accent"
         />
+        <button
+          onClick={commit}
+          disabled={!draft.trim()}
+          className="border border-line px-2.5 py-1 text-xs text-muted hover:text-accent hover:border-accent disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          Add
+        </button>
       </div>
-
-      {/* Bulk paste — for 10+ values at once */}
-      <div>
-        <textarea
-          value={bulk}
-          onChange={(e) => setBulk(e.target.value)}
-          onKeyDown={(e) => {
-            // Cmd/Ctrl+Enter adds the list without leaving the keyboard.
-            if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
-              e.preventDefault();
-              addBulk();
-            }
-          }}
-          placeholder="Paste a list — commas, new lines, or a spreadsheet column"
-          rows={2}
-          className="w-full min-w-[16rem] resize-y bg-surface border border-line px-2 py-1.5 text-xs text-fg outline-none focus:border-accent"
-        />
-        <div className="mt-1.5 flex items-center gap-3">
-          <button
-            onClick={addBulk}
-            disabled={!bulk.trim()}
-            className="border border-line px-2.5 py-1 text-xs text-muted hover:text-accent hover:border-accent disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            Add all →
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-xs text-faint">
+          Paste many at once — commas, new lines, or a spreadsheet column split automatically.
+        </span>
+        {values.length > 0 && (
+          <button onClick={() => onChange([])} className="shrink-0 text-xs text-faint hover:text-fail">
+            Clear all
           </button>
-          {values.length > 0 && (
-            <button onClick={() => onChange([])} className="text-xs text-faint hover:text-fail">
-              Clear all
-            </button>
-          )}
-        </div>
+        )}
       </div>
     </div>
   );

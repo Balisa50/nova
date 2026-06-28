@@ -16,6 +16,7 @@ Mode 2 (Create) — generate from domain knowledge alone, no dataset:
 from __future__ import annotations
 
 import io
+import json
 import os
 
 import pandas as pd
@@ -72,6 +73,22 @@ def sample_csv():
                              headers={"Content-Disposition": "attachment; filename=sample_loans.csv"})
 
 
+def _read_table(filename: str, raw: bytes) -> pd.DataFrame:
+    """Parse an uploaded dataset from CSV, Excel (.xlsx/.xls), or JSON."""
+    name = filename.lower()
+    if name.endswith(".csv"):
+        return pd.read_csv(io.BytesIO(raw), keep_default_na=False)
+    if name.endswith((".xlsx", ".xls")):
+        return pd.read_excel(io.BytesIO(raw))  # needs openpyxl for .xlsx
+    if name.endswith(".json"):
+        data = json.loads(raw.decode("utf-8"))
+        # Accept a bare array of records, or a wrapper like {"data": [...]}.
+        if isinstance(data, dict) and isinstance(data.get("data"), list):
+            data = data["data"]
+        return pd.DataFrame(data)
+    raise HTTPException(400, "Please upload a .csv, .xlsx, or .json file.")
+
+
 @app.post("/api/generate")
 async def generate(
     file: UploadFile | None = File(None),
@@ -83,17 +100,17 @@ async def generate(
 
     real_df = None
     if file is not None:
-        if not file.filename.lower().endswith(".csv"):
-            raise HTTPException(400, "Please upload a .csv file.")
         raw = await file.read()
         if len(raw) > 25 * 1024 * 1024:
             raise HTTPException(413, "File too large (max 25 MB).")
         try:
-            real_df = pd.read_csv(io.BytesIO(raw), keep_default_na=False)
+            real_df = _read_table(file.filename or "", raw)
+        except HTTPException:
+            raise
         except Exception as exc:
-            raise HTTPException(400, f"Could not parse CSV: {exc}")
-        if real_df.empty:
-            raise HTTPException(400, "Uploaded CSV has no rows.")
+            raise HTTPException(400, f"Could not parse file: {exc}")
+        if real_df is None or real_df.empty:
+            raise HTTPException(400, "Uploaded file has no rows.")
 
     try:
         return service.generate(real_df, num_rows=num_rows, default_rate=default_rate)

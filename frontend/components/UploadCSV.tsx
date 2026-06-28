@@ -19,7 +19,12 @@ export function UploadCSV({
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: { "text/csv": [".csv"] },
+    accept: {
+      "text/csv": [".csv"],
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [".xlsx"],
+      "application/vnd.ms-excel": [".xls"],
+      "application/json": [".json"],
+    },
     maxFiles: 1,
   });
 
@@ -47,10 +52,10 @@ export function UploadCSV({
             ) : (
               <>
                 <div className="font-medium">
-                  {isDragActive ? "Drop the CSV here" : "Drop a CSV, or click to browse"}
+                  {isDragActive ? "Drop the file here" : "Drop a CSV, Excel, or JSON file, or click to browse"}
                 </div>
                 <div className="text-sm text-muted">
-                  Must match the West African loan schema · max 25 MB
+                  .csv, .xlsx, or .json · must match the West African loan schema · max 25 MB
                 </div>
               </>
             )}

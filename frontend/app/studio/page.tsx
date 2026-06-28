@@ -104,14 +104,14 @@ export default function Studio() {
                   max={status?.max_rows ?? 20000}
                   value={numRows}
                   onChange={(e) => setNumRows(Number(e.target.value))}
-                  className="bg-surface border border-line px-3 py-2 w-40 tabular outline-none focus:border-accent"
+                  className="rounded-lg bg-surface border border-line px-3 py-2 w-40 tabular outline-none focus:border-accent"
                 />
                 <div className="flex gap-2">
                   {ROW_PRESETS.map((p) => (
                     <button
                       key={p}
                       onClick={() => setNumRows(p)}
-                      className={`px-3 py-2 text-sm border ${
+                      className={`rounded-lg px-3 py-2 text-sm border ${
                         numRows === p ? "border-accent text-accent" : "border-line text-muted"
                       }`}
                     >
@@ -153,7 +153,7 @@ export default function Studio() {
               <button
                 onClick={onGenerate}
                 disabled={busy}
-                className="mt-8 w-full bg-accent text-bg py-3.5 font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90"
+                className="mt-8 w-full rounded-xl bg-accent text-bg py-3.5 font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90"
               >
                 {busy ? "Generating + validating…" : "Generate synthetic data →"}
               </button>

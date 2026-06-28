@@ -30,7 +30,7 @@ function Nav() {
           </Link>
           <Link
             href="/studio"
-            className="text-bg bg-accent px-4 py-2 font-medium no-underline hover:opacity-90"
+            className="rounded-xl text-bg bg-accent px-4 py-2 font-medium no-underline hover:opacity-90"
           >
             Open studio →
           </Link>

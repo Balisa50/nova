@@ -229,7 +229,7 @@ export function CreateMode() {
               onChange={(e) => setSpecText(e.target.value)}
               spellCheck={false}
               rows={18}
-              className="w-full bg-surface border border-line p-3 font-mono text-xs text-muted outline-none focus:border-accent"
+              className="w-full rounded-lg bg-surface border border-line p-3 font-mono text-xs text-muted outline-none focus:border-accent"
             />
           )}
 
@@ -245,13 +245,13 @@ export function CreateMode() {
                   max={20000}
                   value={numRows}
                   onChange={(e) => setNumRows(Number(e.target.value))}
-                  className="bg-surface border border-line px-3 py-2 w-32 tabular outline-none focus:border-accent"
+                  className="rounded-lg bg-surface border border-line px-3 py-2 w-32 tabular outline-none focus:border-accent"
                 />
                 {ROW_PRESETS.map((p) => (
                   <button
                     key={p}
                     onClick={() => setNumRows(p)}
-                    className={`px-3 py-2 text-sm border ${
+                    className={`rounded-lg px-3 py-2 text-sm border ${
                       numRows === p ? "border-accent text-accent" : "border-line text-muted"
                     }`}
                   >
@@ -263,7 +263,7 @@ export function CreateMode() {
             <button
               onClick={() => run(seed)}
               disabled={busy || incomplete}
-              className="bg-accent text-bg px-6 py-3 font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90"
+              className="rounded-xl bg-accent text-bg px-6 py-3 font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90"
             >
               {busy ? "Creating…" : "Create the data →"}
             </button>
@@ -365,13 +365,13 @@ function CreateResults({
       </div>
 
       <div className="mt-8 flex flex-wrap gap-4">
-        <button onClick={download} className="bg-accent text-bg px-5 py-2.5 text-sm font-medium hover:opacity-90">
+        <button onClick={download} className="rounded-xl bg-accent text-bg px-5 py-2.5 text-sm font-medium hover:opacity-90">
           ↓ Download CSV ({r.n_rows.toLocaleString()} records)
         </button>
         <button
           onClick={onRegenerate}
           disabled={busy}
-          className="border border-line text-muted px-5 py-2.5 text-sm hover:text-fg hover:border-accent disabled:opacity-40"
+          className="rounded-xl border border-line text-muted px-5 py-2.5 text-sm hover:text-fg hover:border-accent disabled:opacity-40"
         >
           {busy ? "Creating…" : "↻ Regenerate"}
         </button>

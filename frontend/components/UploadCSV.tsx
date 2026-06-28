@@ -32,7 +32,7 @@ export function UploadCSV({
     <div>
       <div
         {...getRootProps()}
-        className={`border border-dashed px-6 py-10 cursor-pointer transition-colors ${
+        className={`rounded-xl border border-dashed px-6 py-10 cursor-pointer transition-colors ${
           isDragActive
             ? "border-accent bg-accent-dim"
             : "border-line-strong hover:border-fg/40"

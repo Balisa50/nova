@@ -70,7 +70,7 @@ export default function Home() {
         <div className="mt-10 flex flex-wrap items-center gap-5">
           <Link
             href="/studio"
-            className="bg-accent text-bg px-6 py-3 font-medium no-underline hover:opacity-90"
+            className="rounded-xl bg-accent text-bg px-6 py-3 font-medium no-underline hover:opacity-90"
           >
             Generate data →
           </Link>
@@ -193,7 +193,7 @@ export default function Home() {
         <p className="mt-4 text-muted">Pick a domain, or upload your own CSV. No sign-up.</p>
         <Link
           href="/studio"
-          className="inline-block mt-8 bg-accent text-bg px-8 py-4 font-medium no-underline hover:opacity-90"
+          className="inline-block mt-8 rounded-xl bg-accent text-bg px-8 py-4 font-medium no-underline hover:opacity-90"
         >
           Open the studio →
         </Link>

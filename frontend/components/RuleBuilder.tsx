@@ -138,7 +138,7 @@ export function RuleBuilder({
 
       <button
         onClick={add}
-        className="mt-5 border border-line text-muted hover:text-accent hover:border-accent px-4 py-2.5 text-sm"
+        className="mt-5 rounded-lg border border-line text-muted hover:text-accent hover:border-accent px-4 py-2.5 text-sm"
       >
         + Add a rule
       </button>
@@ -546,7 +546,7 @@ function Select({
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="bg-surface border border-line px-2 py-1.5 text-sm text-fg outline-none focus:border-accent"
+      className="rounded-lg bg-surface border border-line px-2 py-1.5 text-sm text-fg outline-none focus:border-accent"
     >
       {options.map((o) => (
         <option key={o.value} value={o.value}>
@@ -593,7 +593,7 @@ function ValueField({
         type="date"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="bg-surface border border-line px-2 py-1.5 text-sm text-fg outline-none focus:border-accent"
+        className="rounded-lg bg-surface border border-line px-2 py-1.5 text-sm text-fg outline-none focus:border-accent"
       />
     );
   }
@@ -604,7 +604,7 @@ function ValueField({
         value={value}
         placeholder="text"
         onChange={(e) => onChange(e.target.value)}
-        className="bg-surface border border-line px-2 py-1.5 w-40 text-sm text-fg outline-none focus:border-accent"
+        className="rounded-lg bg-surface border border-line px-2 py-1.5 w-40 text-sm text-fg outline-none focus:border-accent"
       />
     );
   }
@@ -627,7 +627,7 @@ function NumberField({
         value={value}
         placeholder="0"
         onChange={(e) => onChange(e.target.value)}
-        className="bg-surface border border-line px-2 py-1.5 w-24 text-sm tabular text-fg outline-none focus:border-accent"
+        className="rounded-lg bg-surface border border-line px-2 py-1.5 w-24 text-sm tabular text-fg outline-none focus:border-accent"
       />
       {suffix && <span className="ml-1 text-sm text-faint">{suffix}</span>}
     </span>

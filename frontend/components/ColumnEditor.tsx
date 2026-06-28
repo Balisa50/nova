@@ -119,14 +119,14 @@ export function ColumnEditor({
                   <input
                     value={c.name}
                     onChange={(e) => patch(i, { name: e.target.value.replace(/\s+/g, "_") })}
-                    className="bg-surface border border-line px-2 py-1 w-40 text-fg outline-none focus:border-accent"
+                    className="rounded-lg bg-surface border border-line px-2 py-1 w-40 text-fg outline-none focus:border-accent"
                   />
                 </td>
                 <td className="px-3 py-2">
                   <select
                     value={c.type}
                     onChange={(e) => setType(i, e.target.value)}
-                    className="bg-surface border border-line px-2 py-1 text-fg outline-none focus:border-accent"
+                    className="rounded-lg bg-surface border border-line px-2 py-1 text-fg outline-none focus:border-accent"
                   >
                     {TYPES.map((t) => (
                       <option key={t.value} value={t.value}>
@@ -150,7 +150,7 @@ export function ColumnEditor({
                       value={String(dist.value ?? "")}
                       placeholder="default text (optional)"
                       onChange={(e) => setText(i, e.target.value)}
-                      className="bg-surface border border-line px-2 py-1 w-56 text-fg outline-none focus:border-accent"
+                      className="rounded-lg bg-surface border border-line px-2 py-1 w-56 text-fg outline-none focus:border-accent"
                     />
                   ) : c.type === "datetime" ? (
                     <span className="inline-flex flex-wrap items-center gap-1">
@@ -158,14 +158,14 @@ export function ColumnEditor({
                         type="date"
                         value={fromEpochDays(c.min ?? todayDays() - 365)}
                         onChange={(e) => setDate(i, "min", e.target.value)}
-                        className="bg-surface border border-line px-2 py-1 text-fg outline-none focus:border-accent"
+                        className="rounded-lg bg-surface border border-line px-2 py-1 text-fg outline-none focus:border-accent"
                       />
                       <span className="text-faint">to</span>
                       <input
                         type="date"
                         value={fromEpochDays(c.max ?? todayDays())}
                         onChange={(e) => setDate(i, "max", e.target.value)}
-                        className="bg-surface border border-line px-2 py-1 text-fg outline-none focus:border-accent"
+                        className="rounded-lg bg-surface border border-line px-2 py-1 text-fg outline-none focus:border-accent"
                       />
                     </span>
                   ) : (
@@ -174,14 +174,14 @@ export function ColumnEditor({
                         type="number"
                         value={c.min ?? 0}
                         onChange={(e) => setRange(i, "min", Number(e.target.value))}
-                        className="bg-surface border border-line px-2 py-1 w-20 text-fg outline-none focus:border-accent"
+                        className="rounded-lg bg-surface border border-line px-2 py-1 w-20 text-fg outline-none focus:border-accent"
                       />
                       <span className="text-faint">to</span>
                       <input
                         type="number"
                         value={c.max ?? 100}
                         onChange={(e) => setRange(i, "max", Number(e.target.value))}
-                        className="bg-surface border border-line px-2 py-1 w-20 text-fg outline-none focus:border-accent"
+                        className="rounded-lg bg-surface border border-line px-2 py-1 w-20 text-fg outline-none focus:border-accent"
                       />
                     </span>
                   )}
@@ -287,12 +287,12 @@ function CategoryValues({
             }
           }}
           onBlur={commit}
-          className="min-w-0 flex-1 bg-surface border border-line px-2 py-1 text-fg outline-none focus:border-accent"
+          className="min-w-0 flex-1 rounded-lg bg-surface border border-line px-2 py-1 text-fg outline-none focus:border-accent"
         />
         <button
           onClick={commit}
           disabled={!draft.trim()}
-          className="border border-line px-2.5 py-1 text-xs text-muted hover:text-accent hover:border-accent disabled:opacity-40 disabled:cursor-not-allowed"
+          className="rounded-lg border border-line px-2.5 py-1 text-xs text-muted hover:text-accent hover:border-accent disabled:opacity-40 disabled:cursor-not-allowed"
         >
           Add
         </button>

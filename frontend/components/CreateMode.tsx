@@ -202,16 +202,20 @@ export function CreateMode() {
             needed.
           </p>
 
-          <div className="flex gap-px bg-line w-fit mb-6">
+          <div className="inline-flex gap-1 rounded-2xl border border-line bg-surface/50 p-1 w-fit mb-6">
             <button
               onClick={toVisual}
-              className={`px-5 py-2 text-sm bg-bg ${tab === "visual" ? "text-fg" : "text-muted hover:text-fg"}`}
+              className={`rounded-xl px-5 py-2 text-sm transition-all duration-200 ${
+                tab === "visual" ? "bg-bg text-accent shadow-[0_1px_3px_rgba(0,0,0,0.45)]" : "text-muted hover:text-fg"
+              }`}
             >
               Visual rules
             </button>
             <button
               onClick={toJson}
-              className={`px-5 py-2 text-sm bg-bg ${tab === "json" ? "text-fg" : "text-muted hover:text-fg"}`}
+              className={`rounded-xl px-5 py-2 text-sm transition-all duration-200 ${
+                tab === "json" ? "bg-bg text-accent shadow-[0_1px_3px_rgba(0,0,0,0.45)]" : "text-muted hover:text-fg"
+              }`}
             >
               JSON (advanced)
             </button>

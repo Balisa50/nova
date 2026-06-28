@@ -205,19 +205,18 @@ function ModeToggle({
     { id: "copy", label: "Copy", sub: "from a dataset you have" },
   ];
   return (
-    <div className="mt-8 flex gap-px bg-line w-full sm:w-fit">
+    <div className="mt-8 inline-flex w-full gap-1 rounded-2xl border border-line bg-surface/50 p-1 sm:w-auto">
       {tabs.map((t) => {
         const on = t.id === mode;
         return (
           <button
             key={t.id}
             onClick={() => setMode(t.id)}
-            className={`flex-1 sm:flex-none text-left px-6 py-3 bg-bg ${
-              on ? "text-fg" : "text-muted hover:text-fg"
+            className={`flex-1 rounded-xl px-6 py-3 text-left transition-all duration-200 sm:flex-none ${
+              on ? "bg-bg shadow-[0_1px_3px_rgba(0,0,0,0.45)]" : "hover:bg-bg/40"
             }`}
           >
-            <span className={`block w-6 border-t-2 mb-2 ${on ? "border-accent" : "border-line"}`} />
-            <span className="block font-medium">{t.label}</span>
+            <span className={`block font-medium ${on ? "text-accent" : "text-muted"}`}>{t.label}</span>
             <span className="block text-xs text-faint">{t.sub}</span>
           </button>
         );

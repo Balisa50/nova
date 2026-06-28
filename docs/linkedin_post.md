@@ -10,9 +10,9 @@ But I couldn't get real data from home. The Gambia doesn't have open datasets fo
 
 So I built a tool that does it for me. It's called NOVA, and it has two modes.
 
-Mode 1 — Copy. You upload a CSV. NOVA learns the patterns (distributions, correlations, the way the columns actually move together) and generates more of the same. Under the hood it's a Conditional Tabular GAN, written from scratch in PyTorch. No model libraries, just the paper and the code.
+Mode 1 - Copy. You upload a CSV. NOVA learns the patterns (distributions, correlations, the way the columns actually move together) and generates more of the same. Under the hood it's a Conditional Tabular GAN, written from scratch in PyTorch. No model libraries, just the paper and the code.
 
-Mode 2 — Create. You define the columns, the rules, and the distributions, and NOVA generates data from that knowledge alone. No dataset required. I used this to generate 50,000 WASSCE student records for The Gambia from GBoS, UNESCO, and WAEC statistics. It took about ten seconds.
+Mode 2 - Create. You define the columns, the rules, and the distributions, and NOVA generates data from that knowledge alone. No dataset required. I used this to generate 50,000 WASSCE student records for The Gambia from GBoS, UNESCO, and WAEC statistics. It took about ten seconds.
 
 I validated the copy mode on real West African loan data, the only set I could get my hands on. Four checks:
 

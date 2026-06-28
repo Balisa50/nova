@@ -32,7 +32,7 @@ export default function Studio() {
           if (!cancelled) setStatus(s);
         })
         .catch(() => {
-          // Quietly keep retrying while a cold backend boots — never alarm the user.
+          // Quietly keep retrying while a cold backend boots - never alarm the user.
           if (cancelled) return;
           tries += 1;
           if (tries < 12) setTimeout(check, 5000);
@@ -226,7 +226,7 @@ function ModeToggle({
 }
 
 function ModelBadge({ status }: { status: StatusResponse | null }) {
-  // Two calm states only — "ready" or "warming up". Never a red "offline".
+  // Two calm states only - "ready" or "warming up". Never a red "offline".
   if (!status) return <span className="text-sm text-faint font-mono">● warming up…</span>;
   return <span className="text-sm font-mono text-pass">● ready</span>;
 }

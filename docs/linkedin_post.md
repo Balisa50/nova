@@ -23,7 +23,7 @@ I validated the copy mode on real West African loan data, the only set I could g
 
 All four passed.
 
-The app is live and open source: https://nova-gamma-eight.vercel.app
+The app is live and open source: https://nova-fin.vercel.app
 
 It's not perfect. The backend goes to sleep after five minutes, so the first request is slow. The UI could be cleaner. But it works, and I learned more building the GAN from scratch than I ever would have from importing one.
 

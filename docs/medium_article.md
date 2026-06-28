@@ -60,7 +60,7 @@ For Mode 2, I tested it by generating 50,000 WASSCE student records for The Gamb
 
 NOVA is a real web app, not a notebook. Next.js on Vercel for the studio, FastAPI on Fly.io for the engine.
 
-It's live: **https://nova-gamma-eight.vercel.app**
+It's live: **https://nova-fin.vercel.app**
 
 You can pick a domain (loans, transactions, insurance, remittances, macro indicators, investments, corporate statements) or define your own. You build rules with dropdowns instead of code, generate thousands of rows in seconds, and download a CSV. For custom domains you define each column with a type (number, category, yes/no, date, ID, text), and you can paste a whole list of category values at once instead of typing them in one by one.
 

@@ -54,12 +54,14 @@ function prettyCol(name: string): string {
 }
 
 export function CreateMode() {
-  const [selectedId, setSelectedId] = useState<string>(DOMAINS[0].id);
-  const [spec, setSpec] = useState<CriteriaSpec>(() => clone(DOMAINS[0].spec));
-  const [specText, setSpecText] = useState(() => JSON.stringify(DOMAINS[0].spec, null, 2));
+  // Nothing is selected on load: the user picks a domain (or "Your own domain")
+  // before any rules / column editor / generate controls appear.
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [spec, setSpec] = useState<CriteriaSpec | null>(null);
+  const [specText, setSpecText] = useState("");
   const [tab, setTab] = useState<"visual" | "json">("visual");
-  const [items, setItems] = useState<Item[]>(() => parseItems(DOMAINS[0].spec));
-  const [cols, setCols] = useState<ColMeta[]>(() => columnMeta(DOMAINS[0].spec));
+  const [items, setItems] = useState<Item[]>([]);
+  const [cols, setCols] = useState<ColMeta[]>([]);
   const [showCols, setShowCols] = useState(false);
 
   const [numRows, setNumRows] = useState(5000);
@@ -84,13 +86,14 @@ export function CreateMode() {
   }
 
   function setColumns(newCols: ColumnSpec[]) {
+    if (!spec) return;
     const s = { ...spec, columns: newCols };
     setSpec(s);
     setCols(columnMeta(s));
   }
 
   function toJson() {
-    if (tab === "json") return;
+    if (tab === "json" || !spec) return;
     setSpecText(JSON.stringify(buildSpec(spec, items, cols), null, 2));
     setTab("json");
   }
@@ -110,6 +113,7 @@ export function CreateMode() {
 
   function currentSpec(): CriteriaSpec {
     if (tab === "json") return JSON.parse(specText); // may throw, caught in run()
+    if (!spec) throw new Error("Pick a domain first.");
     return buildSpec(spec, items, cols);
   }
 
@@ -172,6 +176,8 @@ export function CreateMode() {
         })}
       </div>
 
+      {selectedId && spec ? (
+        <>
       {/* columns */}
       <div className="mt-6">
         <button
@@ -262,6 +268,13 @@ export function CreateMode() {
             <p className="mt-4 text-sm text-faint">Fill in every rule value to continue.</p>
           )}
           {error && <p className="mt-4 text-sm text-fail">{error}</p>}
+        </>
+      ) : (
+        <p className="mt-6 text-sm text-faint">
+          Pick a domain above, or choose &ldquo;Your own domain&rdquo;, to define your columns, rules,
+          and generate data.
+        </p>
+      )}
 
       {result && (
         <CreateResults

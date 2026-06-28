@@ -8,7 +8,7 @@ export const runtime = "nodejs";
 export const maxDuration = 60;
 
 const WARMING_MESSAGE =
-  "The engine is warming up — this can take a few seconds the first time. Please try again in a moment.";
+  "The engine is warming up - this can take a few seconds the first time. Please try again in a moment.";
 
 export async function POST(request: NextRequest) {
   try {

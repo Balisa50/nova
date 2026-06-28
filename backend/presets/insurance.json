@@ -1,6 +1,6 @@
 {
   "id": "insurance",
-  "name": "Insurance \u2014 Actuarial Modeling",
+  "name": "Insurance: Actuarial Modeling",
   "description": "Generate policy and claims data for pricing and risk analysis.",
   "domain": "Insurance",
   "target": "claim",

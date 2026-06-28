@@ -1,6 +1,6 @@
 {
   "id": "loans",
-  "name": "Loans \u2014 Credit Scoring",
+  "name": "Loans: Credit Scoring",
   "description": "Generate loan applications with believable default patterns, for credit scoring and risk models.",
   "domain": "Banking",
   "target": "default",

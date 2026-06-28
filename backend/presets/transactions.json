@@ -1,6 +1,6 @@
 {
   "id": "transactions",
-  "name": "Transactions \u2014 Fraud Detection",
+  "name": "Transactions: Fraud Detection",
   "description": "Generate payment data to train fraud-detection models, with realistic suspicious activity.",
   "domain": "Payments",
   "target": "fraud",

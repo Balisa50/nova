@@ -1,6 +1,6 @@
 {
   "id": "remittances",
-  "name": "Remittances \u2014 Economic Analysis",
+  "name": "Remittances: Economic Analysis",
   "description": "Generate cross-border transfer data for economic and corridor research.",
   "domain": "Remittances",
   "target": null,

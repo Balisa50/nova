@@ -1,6 +1,6 @@
 {
   "id": "investment",
-  "name": "Investment \u2014 Portfolio Modeling",
+  "name": "Investment: Portfolio Modeling",
   "description": "Generate portfolio holdings and returns for asset allocation and risk modelling.",
   "domain": "Wealth",
   "target": "is_underwater",

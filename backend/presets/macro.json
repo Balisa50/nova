@@ -1,6 +1,6 @@
 {
   "id": "macro",
-  "name": "Macro \u2014 Economic Indicators",
+  "name": "Macro: Economic Indicators",
   "description": "Generate country-level economic indicators for forecasting and policy work.",
   "domain": "Macro",
   "target": null,

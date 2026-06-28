@@ -76,7 +76,7 @@ export interface StatusResponse {
 // Calm, reassuring copy for the one thing that genuinely fails sometimes: the
 // free-tier backend waking from sleep. Never surface raw "fetch failed" / URLs.
 export const WARMING_MESSAGE =
-  "The engine is warming up — this can take a few seconds the first time. Please try again in a moment.";
+  "The engine is warming up - this can take a few seconds the first time. Please try again in a moment.";
 
 /** Best-effort nudge to wake a scale-to-zero backend (blocks until it boots). */
 async function wakeBackend(): Promise<void> {

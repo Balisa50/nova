@@ -22,9 +22,9 @@ That's NOVA.
 
 The idea is simple. Sometimes you have a little real data and want more of it. Sometimes you have no data at all, just knowledge about how a thing behaves. NOVA handles both.
 
-**Mode 1 — Copy.** You upload a CSV. NOVA learns the structure of it (the distributions, the correlations, the way columns move together) and generates brand-new rows that follow the same patterns without copying anyone.
+**Mode 1 - Copy.** You upload a CSV. NOVA learns the structure of it (the distributions, the correlations, the way columns move together) and generates brand-new rows that follow the same patterns without copying anyone.
 
-**Mode 2 — Create.** You describe the data instead of uploading it. Define the columns, give each one a distribution, write a few domain rules ("rural schools score lower", "a new account making a large international transfer is probably fraud"), and NOVA generates a dataset from that description alone. No source data required.
+**Mode 2 - Create.** You describe the data instead of uploading it. Define the columns, give each one a distribution, write a few domain rules ("rural schools score lower", "a new account making a large international transfer is probably fraud"), and NOVA generates a dataset from that description alone. No source data required.
 
 ## The research behind it
 
@@ -36,7 +36,7 @@ Mode 1 is a **Conditional Tabular GAN (CTGAN)**, implemented in PyTorch from the
 - **Training-by-sampling with a conditional vector.** Rare categories get drowned out if you sample naively. So during training the generator is conditioned on a randomly chosen category, and the data is sampled to match, which forces the model to actually learn the rare classes.
 - **A PacGAN critic with WGAN-GP loss.** Packing several samples into each critic decision is a cheap, effective defence against mode collapse, and the gradient penalty keeps training stable.
 
-Mode 2 is a **criteria engine**: a small, vectorised rule interpreter. You give it columns, distributions, and ordered rules, and it samples and applies the rules like spreadsheet formulas. The rules arrive as strings over an API, so I evaluate them with a **whitelist AST evaluator** rather than `eval` — only arithmetic, comparisons, boolean logic, and a handful of safe functions are allowed, so a user can't inject code through a rule.
+Mode 2 is a **criteria engine**: a small, vectorised rule interpreter. You give it columns, distributions, and ordered rules, and it samples and applies the rules like spreadsheet formulas. The rules arrive as strings over an API, so I evaluate them with a **whitelist AST evaluator** rather than `eval` - only arithmetic, comparisons, boolean logic, and a handful of safe functions are allowed, so a user can't inject code through a rule.
 
 ## Validation, honestly
 
@@ -44,13 +44,13 @@ Anyone can claim their synthetic data is good. I wanted to measure it, and I wan
 
 I validated Mode 1 on a West African loan dataset, the only real data I could get. Four checks:
 
-**1. Statistical similarity — 0.94.** Per column, I compare the real and synthetic distributions (Kolmogorov–Smirnov for continuous, Chi-squared for categorical). One honest note: I score these on the *test statistic*, the actual effect size, not the p-value. At ten thousand rows a p-value collapses to zero for any model, so a "p > 0.05" pass rule is impossible to satisfy and would be dishonest to report. The statistic measures how far apart the distributions actually are, which is what you care about.
+**1. Statistical similarity - 0.94.** Per column, I compare the real and synthetic distributions (Kolmogorov–Smirnov for continuous, Chi-squared for categorical). One honest note: I score these on the *test statistic*, the actual effect size, not the p-value. At ten thousand rows a p-value collapses to zero for any model, so a "p > 0.05" pass rule is impossible to satisfy and would be dishonest to report. The statistic measures how far apart the distributions actually are, which is what you care about.
 
-**2. Correlation preservation — L1 difference of 0.05.** The real value of tabular data is the relationships between columns. I compare the full correlation matrices and report the average absolute difference. 0.05 means the structure survives.
+**2. Correlation preservation - L1 difference of 0.05.** The real value of tabular data is the relationships between columns. I compare the full correlation matrices and report the average absolute difference. 0.05 means the structure survives.
 
-**3. Train on synthetic, test on real (TSTR) — 92%.** The practical test. Train a classifier only on synthetic data, then evaluate it on real, held-out data. It reaches 92% of the accuracy a model trained on real data gets (94% by AUC). If the synthetic data were junk, this number would fall apart.
+**3. Train on synthetic, test on real (TSTR) - 92%.** The practical test. Train a classifier only on synthetic data, then evaluate it on real, held-out data. It reaches 92% of the accuracy a model trained on real data gets (94% by AUC). If the synthetic data were junk, this number would fall apart.
 
-**4. Privacy — distance-to-closest-record ratio of 1.10.** For privacy I measure how close each synthetic row sits to its nearest real record, compared to how close a fresh real sample sits. A ratio near 1.0 means synthetic rows are no closer to real people than real samples are to each other, so the model isn't memorising. Only 1.1% of rows were near-duplicates. (I deliberately did *not* use a detection classifier here; "can you tell real from fake" measures fidelity, not privacy.)
+**4. Privacy - distance-to-closest-record ratio of 1.10.** For privacy I measure how close each synthetic row sits to its nearest real record, compared to how close a fresh real sample sits. A ratio near 1.0 means synthetic rows are no closer to real people than real samples are to each other, so the model isn't memorising. Only 1.1% of rows were near-duplicates. (I deliberately did *not* use a detection classifier here; "can you tell real from fake" measures fidelity, not privacy.)
 
 All four passed.
 
@@ -88,4 +88,4 @@ If you try it, tell me what breaks. I want to make it better.
 
 ---
 
-*Abdoulie Balisa — [portfolio](https://balisa50.github.io) · [GitHub](https://github.com/Balisa50)*
+*Abdoulie Balisa - [portfolio](https://balisa50.github.io) · [GitHub](https://github.com/Balisa50)*

@@ -38,7 +38,7 @@ def cat(values, weights=None):
 
 # --------------------------------------------------------------------------- #
 LOANS = {
-    "id": "loans", "name": "Loans — Credit Scoring",
+    "id": "loans", "name": "Loans: Credit Scoring",
     "description": "Generate loan applications with believable default patterns, for credit scoring and risk models.",
     "domain": "Banking", "target": "default",
     "highlights": [
@@ -81,7 +81,7 @@ LOANS = {
 }
 
 TRANSACTIONS = {
-    "id": "transactions", "name": "Transactions — Fraud Detection",
+    "id": "transactions", "name": "Transactions: Fraud Detection",
     "description": "Generate payment data to train fraud-detection models, with realistic suspicious activity.",
     "domain": "Payments", "target": "fraud",
     "highlights": [
@@ -119,7 +119,7 @@ TRANSACTIONS = {
 }
 
 INSURANCE = {
-    "id": "insurance", "name": "Insurance — Actuarial Modeling",
+    "id": "insurance", "name": "Insurance: Actuarial Modeling",
     "description": "Generate policy and claims data for pricing and risk analysis.",
     "domain": "Insurance", "target": "claim",
     "highlights": [
@@ -160,7 +160,7 @@ INSURANCE = {
 }
 
 REMITTANCES = {
-    "id": "remittances", "name": "Remittances — Economic Analysis",
+    "id": "remittances", "name": "Remittances: Economic Analysis",
     "description": "Generate cross-border transfer data for economic and corridor research.",
     "domain": "Remittances", "target": None,
     "highlights": [
@@ -194,7 +194,7 @@ REMITTANCES = {
 }
 
 MACRO = {
-    "id": "macro", "name": "Macro — Economic Indicators",
+    "id": "macro", "name": "Macro: Economic Indicators",
     "description": "Generate country-level economic indicators for forecasting and policy work.",
     "domain": "Macro", "target": None,
     "highlights": [
@@ -224,7 +224,7 @@ MACRO = {
 }
 
 INVESTMENT = {
-    "id": "investment", "name": "Investment — Portfolio Modeling",
+    "id": "investment", "name": "Investment: Portfolio Modeling",
     "description": "Generate portfolio holdings and returns for asset allocation and risk modelling.",
     "domain": "Wealth", "target": "is_underwater",
     "highlights": [
@@ -257,7 +257,7 @@ INVESTMENT = {
 }
 
 CORPORATE = {
-    "id": "corporate", "name": "Corporate — Financial Statements",
+    "id": "corporate", "name": "Corporate: Financial Statements",
     "description": "Generate company financials for credit analysis and valuation.",
     "domain": "Corporate", "target": None,
     "highlights": [

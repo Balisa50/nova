@@ -1,5 +1,5 @@
 """
-NOVA Criteria Engine (Mode 2: Create) — generate synthetic data from domain
+NOVA Criteria Engine (Mode 2: Create): generate synthetic data from domain
 knowledge alone, with no pre-existing dataset.
 
 A *criteria spec* declares columns (each with a base distribution) plus a list
@@ -11,7 +11,7 @@ realised data satisfies the intended targets.
 
 SECURITY: rule conditions and expressions are arbitrary strings that may arrive
 from an untrusted API client. They are evaluated by a *whitelist AST evaluator*
-(`_SafeEval`) — never Python `eval()`. Only arithmetic, comparisons, boolean
+(`_SafeEval`): never Python `eval()`. Only arithmetic, comparisons, boolean
 logic, membership, a ternary, and a small set of numeric functions are allowed;
 attribute access, calls to arbitrary names, subscripting, comprehensions and
 lambdas are rejected. This makes `__import__`/`__class__`-style escapes
@@ -270,7 +270,7 @@ def generate_from_criteria(spec: dict, n_rows: int = 10000, seed: int = 0) -> tu
     for col in columns:
         name, t = col["name"], col.get("type", "continuous")
         if name.startswith("_"):
-            continue  # scratch/helper column — usable in rules, hidden from output
+            continue  # scratch/helper column: usable in rules, hidden from output
         v = np.asarray(env[name])
         if t in ("continuous",):
             v = v.astype(float)

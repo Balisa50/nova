@@ -20,7 +20,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from synthfin.criteria import CriteriaError, generate_from_criteria, safe_eval  # noqa: E402
 
 STUDENT_SPEC = {
-    "name": "Rural Gambia — Student Exam Performance",
+    "name": "Rural Gambia: Student Exam Performance",
     "target": "passed",
     "columns": [
         {"name": "student_id", "type": "id", "dist": {"dist": "uuid"}},
@@ -83,7 +83,7 @@ def main() -> int:
         ok = ok and passed
         print(f"  {'PASS' if passed else 'FAIL'}  {label:<34} ({detail})")
 
-    print("\nSecurity — safe evaluator must reject injection:")
+    print("\nSecurity: safe evaluator must reject injection:")
     attacks = ["__import__('os').system('echo hacked')",
                "().__class__.__bases__", "exam_score.__class__"]
     for atk in attacks:

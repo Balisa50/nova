@@ -99,8 +99,10 @@ export function ColumnEditor({
 
   return (
     <div className="border border-line">
-      <table className="w-full text-sm">
-        <thead>
+      {/* Contained scroll: a wide table scrolls inside this box, never the page. */}
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
           <tr className="border-b border-line text-faint">
             <th className="text-left font-mono text-[11px] px-3 py-2">COLUMN</th>
             <th className="text-left font-mono text-[11px] px-3 py-2">TYPE</th>
@@ -193,7 +195,8 @@ export function ColumnEditor({
             );
           })}
         </tbody>
-      </table>
+        </table>
+      </div>
       <div className="px-3 py-2">
         <button onClick={add} className="text-xs text-faint hover:text-accent">
           + add column
@@ -205,7 +208,7 @@ export function ColumnEditor({
 
 // Split a pasted blob into clean values. Handles commas, semicolons, new lines,
 // and tabs (so a spreadsheet column or row pastes cleanly). We deliberately do
-// NOT split on spaces — that would break multi-word values like "Greater Banjul".
+// NOT split on spaces: that would break multi-word values like "Greater Banjul".
 function parseList(raw: string): string[] {
   return raw
     .split(/[,;\n\r\t]+/)
@@ -284,7 +287,7 @@ function CategoryValues({
             }
           }}
           onBlur={commit}
-          className="min-w-[12rem] flex-1 bg-surface border border-line px-2 py-1 text-fg outline-none focus:border-accent"
+          className="min-w-0 flex-1 bg-surface border border-line px-2 py-1 text-fg outline-none focus:border-accent"
         />
         <button
           onClick={commit}
@@ -296,7 +299,7 @@ function CategoryValues({
       </div>
       <div className="flex items-center justify-between gap-3">
         <span className="text-xs text-faint">
-          Paste many at once — commas, new lines, or a spreadsheet column split automatically.
+          Paste many at once: commas, new lines, or a spreadsheet column split automatically.
         </span>
         {values.length > 0 && (
           <button onClick={() => onChange([])} className="shrink-0 text-xs text-faint hover:text-fail">

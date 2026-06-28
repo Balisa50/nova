@@ -1,13 +1,13 @@
 """
 NOVA FastAPI backend.
 
-Mode 1 (Copy) — learn from real data, generate more:
+Mode 1 (Copy): learn from real data, generate more:
     GET  /api/health            -> liveness + whether a model is loaded
     GET  /api/status            -> model metadata (epochs, columns, target, device)
     POST /api/generate          -> CSV (optional) + num_rows + default_rate
     GET  /api/sample            -> download the bundled ground-truth CSV
 
-Mode 2 (Create) — generate from domain knowledge alone, no dataset:
+Mode 2 (Create): generate from domain knowledge alone, no dataset:
     GET  /api/presets           -> list the financial-domain criteria presets
     GET  /api/preset/{id}       -> full criteria spec for one preset
     POST /api/generate-criteria -> spec (or preset_id) + num_rows => synthetic data
@@ -33,7 +33,7 @@ from .service import DEFAULT_CSV, MAX_ROWS, SynthFinService
 app = FastAPI(
     title="NOVA API",
     version="2.0.0",
-    description="Universal synthetic financial data — Copy (CTGAN) and Create (criteria engine).",
+    description="Universal synthetic financial data: Copy (CTGAN) and Create (criteria engine).",
 )
 
 origins = os.environ.get("CORS_ORIGINS", "*").split(",")
@@ -121,7 +121,7 @@ async def generate(
 
 
 # --------------------------------------------------------------------------- #
-# Mode 2: Create (criteria engine — no dataset required)
+# Mode 2: Create (criteria engine: no dataset required)
 # --------------------------------------------------------------------------- #
 class CriteriaRequest(BaseModel):
     preset_id: str | None = None

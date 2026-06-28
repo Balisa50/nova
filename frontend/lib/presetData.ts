@@ -6,7 +6,7 @@ import type { CriteriaSpec } from "@/lib/api";
 export const BUNDLED_PRESETS: CriteriaSpec[] = [
 {
   "id": "loans",
-  "name": "Loans — Credit Scoring",
+  "name": "Loans: Credit Scoring",
   "description": "Generate loan applications with believable default patterns, for credit scoring and risk models.",
   "domain": "Banking",
   "target": "default",
@@ -257,7 +257,7 @@ export const BUNDLED_PRESETS: CriteriaSpec[] = [
 },
 {
   "id": "transactions",
-  "name": "Transactions — Fraud Detection",
+  "name": "Transactions: Fraud Detection",
   "description": "Generate payment data to train fraud-detection models, with realistic suspicious activity.",
   "domain": "Payments",
   "target": "fraud",
@@ -467,7 +467,7 @@ export const BUNDLED_PRESETS: CriteriaSpec[] = [
 },
 {
   "id": "insurance",
-  "name": "Insurance — Actuarial Modeling",
+  "name": "Insurance: Actuarial Modeling",
   "description": "Generate policy and claims data for pricing and risk analysis.",
   "domain": "Insurance",
   "target": "claim",
@@ -721,7 +721,7 @@ export const BUNDLED_PRESETS: CriteriaSpec[] = [
 },
 {
   "id": "remittances",
-  "name": "Remittances — Economic Analysis",
+  "name": "Remittances: Economic Analysis",
   "description": "Generate cross-border transfer data for economic and corridor research.",
   "domain": "Remittances",
   "target": null,
@@ -921,7 +921,7 @@ export const BUNDLED_PRESETS: CriteriaSpec[] = [
 },
 {
   "id": "macro",
-  "name": "Macro — Economic Indicators",
+  "name": "Macro: Economic Indicators",
   "description": "Generate country-level economic indicators for forecasting and policy work.",
   "domain": "Macro",
   "target": null,
@@ -1088,7 +1088,7 @@ export const BUNDLED_PRESETS: CriteriaSpec[] = [
 },
 {
   "id": "investment",
-  "name": "Investment — Portfolio Modeling",
+  "name": "Investment: Portfolio Modeling",
   "description": "Generate portfolio holdings and returns for asset allocation and risk modelling.",
   "domain": "Wealth",
   "target": "is_underwater",
@@ -1283,7 +1283,7 @@ export const BUNDLED_PRESETS: CriteriaSpec[] = [
 },
 {
   "id": "corporate",
-  "name": "Corporate — Financial Statements",
+  "name": "Corporate: Financial Statements",
   "description": "Generate company financials for credit analysis and valuation.",
   "domain": "Corporate",
   "target": null,

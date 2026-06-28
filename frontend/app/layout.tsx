@@ -8,7 +8,7 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 
 export const metadata: Metadata = {
   title: "NOVA",
-  description: "NOVA — Synthetic data engine for finance",
+  description: "NOVA: Synthetic data engine for finance",
 };
 
 function Nav() {

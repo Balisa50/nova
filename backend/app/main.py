@@ -17,12 +17,14 @@ from __future__ import annotations
 
 import io
 import json
+import logging
 import os
+from contextlib import asynccontextmanager
 
 import pandas as pd
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import PlainTextResponse
+from fastapi.responses import JSONResponse, PlainTextResponse
 from pydantic import BaseModel
 
 from synthfin.criteria import CriteriaError, generate_from_criteria, validate_spec
@@ -30,10 +32,30 @@ from synthfin.presets import get_preset, list_presets
 
 from .service import DEFAULT_CSV, MAX_ROWS, SynthFinService
 
+logger = logging.getLogger("nova")
+
+service: SynthFinService | None = None
+
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    # Load the model once at boot. If it fails (bad checkpoint, OOM on a small
+    # instance), stay UP in a degraded state rather than crash-looping: health
+    # reports it, and the generate endpoints already guard on model_loaded.
+    global service
+    try:
+        service = SynthFinService()
+    except Exception:  # noqa: BLE001
+        logger.exception("Service failed to initialise; starting in degraded mode")
+        service = None
+    yield
+
+
 app = FastAPI(
     title="NOVA API",
     version="2.0.0",
     description="Universal synthetic financial data: Copy (CTGAN) and Create (criteria engine).",
+    lifespan=lifespan,
 )
 
 origins = os.environ.get("CORS_ORIGINS", "*").split(",")
@@ -45,22 +67,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-service: SynthFinService | None = None
-
-
-@app.on_event("startup")
-def _startup():
-    global service
-    service = SynthFinService()
-
 
 @app.get("/api/health")
 def health():
+    # Never 500 on a health probe: a degraded service still answers cleanly.
+    if service is None:
+        return JSONResponse({"status": "degraded", "model_loaded": False}, status_code=503)
     return service.health()
 
 
 @app.get("/api/status")
 def status():
+    if service is None:
+        raise HTTPException(503, "Service is still starting. Try again shortly.")
     return service.status()
 
 

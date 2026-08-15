@@ -31,6 +31,7 @@ from synthfin.validation import validate_all, print_report  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CSV = os.path.join(ROOT, "data", "west_african_loans.csv")
+HOLDOUT_CSV = os.path.join(ROOT, "data", "holdout.csv")
 MODEL_PATH = os.path.join(ROOT, "models", "ctgan_final.pth")
 REPORT_PATH = os.path.join(ROOT, "models", "validation_report.json")
 
@@ -39,6 +40,21 @@ def main() -> int:
     df = pd.read_csv(CSV, keep_default_na=False)
     schema = detect_schema(df)
     real = df.drop(columns=schema["id_columns"])
+
+    # Validate against rows the generator never saw, if train.py withheld some.
+    # Reading the full CSV here and splitting it inside the metrics was the old
+    # behaviour: the "held-out real" set had been part of training, so TSTR and
+    # the DCR yardstick were both in-sample.
+    if os.path.exists(HOLDOUT_CSV):
+        holdout = pd.read_csv(HOLDOUT_CSV, keep_default_na=False)
+        real = holdout[[c for c in real.columns if c in holdout.columns]]
+        print(f"Validating against {len(real)} held-out rows (never seen in training).")
+    else:
+        print(
+            "WARNING: no data/holdout.csv found, so validation runs against the "
+            "full training set and every metric below is in-sample. Retrain with "
+            "scripts.train (holdout is on by default) to get out-of-sample numbers."
+        )
 
     model = CTGAN.load(MODEL_PATH)
     model.attach_sampler_from(real, schema["discrete"])

@@ -18,6 +18,7 @@ import warnings
 
 import numpy as np
 import pandas as pd
+from sklearn.model_selection import train_test_split
 from sklearn.exceptions import ConvergenceWarning
 
 warnings.filterwarnings("ignore", category=ConvergenceWarning)
@@ -34,6 +35,7 @@ from synthfin.schema import detect_schema  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CSV = os.path.join(ROOT, "data", "west_african_loans.csv")
+HOLDOUT_CSV = os.path.join(ROOT, "data", "holdout.csv")
 MODEL_PATH = os.path.join(ROOT, "models", "ctgan_final.pth")
 LOSS_PATH = os.path.join(ROOT, "models", "loss_history.json")
 
@@ -44,14 +46,41 @@ def main() -> int:
     ap.add_argument("--batch-size", type=int, default=512)
     ap.add_argument("--disc-steps", type=int, default=3,
                     help="critic updates per generator update (WGAN-GP n_critic)")
+    ap.add_argument("--holdout", type=float, default=0.3,
+                    help="fraction withheld from training for out-of-sample validation")
+    ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--smoke", action="store_true",
                     help="tiny run to validate the pipeline end-to-end")
     args = ap.parse_args()
 
     df = pd.read_csv(CSV, keep_default_na=False)
     schema = detect_schema(df)
-    model_df = df.drop(columns=schema["id_columns"])
+    full_df = df.drop(columns=schema["id_columns"])
     discrete = schema["discrete"]
+
+    # Hold a slice out of training and write it beside the data.
+    #
+    # This used to fit on every row, and validate.py then re-read the same CSV
+    # and split it, calling the result a "held-out real" set. The generator had
+    # already seen those rows, so TSTR was scoring synthetic data against a test
+    # set it was indirectly trained on, and the DCR yardstick was a sample the
+    # model had also memorised from. Neither number was out of sample.
+    #
+    # --holdout 0 reproduces the old behaviour for anyone comparing against the
+    # previously published report.
+    if args.holdout > 0:
+        stratify = None
+        target = schema.get("target")
+        if target is not None and full_df[target].nunique() >= 2:
+            stratify = full_df[target].astype(str)
+        model_df, holdout_df = train_test_split(
+            full_df, test_size=args.holdout, random_state=args.seed, stratify=stratify
+        )
+        holdout_df.to_csv(HOLDOUT_CSV, index=False)
+        print(f"Held out {len(holdout_df)} rows -> {HOLDOUT_CSV} (never seen in training)")
+    else:
+        model_df = full_df
+        print("WARNING: --holdout 0, fitting on every row. Validation cannot be out of sample.")
     print(f"Rows={len(model_df)}  discrete={len(discrete)}  "
           f"continuous={len(schema['continuous'])}  target={schema['target']}")
 

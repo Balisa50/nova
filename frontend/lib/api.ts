@@ -78,17 +78,44 @@ export interface StatusResponse {
 export const WARMING_MESSAGE =
   "The engine is warming up - this can take a few seconds the first time. Please try again in a moment.";
 
+/**
+ * fetch with a deadline.
+ *
+ * Every call to the backend went out with no ceiling, so when the backend was
+ * unreachable the browser sat on the request until it gave up on its own,
+ * with the UI showing nothing but a spinner. That was not hypothetical: the
+ * Fly deployment was suspended for weeks and this is exactly how it presented.
+ *
+ * The backend sleeps on a free instance and can take ~50s to wake, so the
+ * default is generous. Waking is a slow success, not a failure, and a ceiling
+ * tight enough to feel responsive would abort every cold start.
+ */
+async function fetchWithTimeout(
+  input: string,
+  init: RequestInit = {},
+  timeoutMs = 60_000,
+): Promise<Response> {
+  try {
+    return await fetch(input, { ...init, signal: AbortSignal.timeout(timeoutMs) });
+  } catch (err) {
+    if (err instanceof Error && err.name === "TimeoutError") {
+      throw new Error(WARMING_MESSAGE);
+    }
+    throw err;
+  }
+}
+
 /** Best-effort nudge to wake a scale-to-zero backend (blocks until it boots). */
 async function wakeBackend(): Promise<void> {
   try {
-    await fetch(`${BACKEND_URL}/api/status`, { cache: "no-store" });
+    await fetchWithTimeout(`${BACKEND_URL}/api/status`, { cache: "no-store" }, 15_000);
   } catch {
     /* best effort */
   }
 }
 
 export async function fetchStatus(): Promise<StatusResponse> {
-  const res = await fetch(`${BACKEND_URL}/api/status`, { cache: "no-store" });
+  const res = await fetchWithTimeout(`${BACKEND_URL}/api/status`, { cache: "no-store" }, 15_000);
   if (!res.ok) throw new Error(`status ${res.status}`);
   return res.json();
 }
@@ -163,13 +190,13 @@ export interface CriteriaResponse {
 }
 
 export async function fetchPresets(): Promise<PresetSummary[]> {
-  const res = await fetch(`${BACKEND_URL}/api/presets`, { cache: "no-store" });
+  const res = await fetchWithTimeout(`${BACKEND_URL}/api/presets`, { cache: "no-store" });
   if (!res.ok) throw new Error(`presets ${res.status}`);
   return (await res.json()).presets;
 }
 
 export async function fetchPreset(id: string): Promise<CriteriaSpec> {
-  const res = await fetch(`${BACKEND_URL}/api/preset/${id}`, { cache: "no-store" });
+  const res = await fetchWithTimeout(`${BACKEND_URL}/api/preset/${id}`, { cache: "no-store" });
   if (!res.ok) throw new Error(`preset ${res.status}`);
   return res.json();
 }
@@ -181,7 +208,7 @@ export async function generateCriteria(body: {
   seed?: number;
 }): Promise<CriteriaResponse> {
   const send = () =>
-    fetch(`${BACKEND_URL}/api/generate-criteria`, {
+    fetchWithTimeout(`${BACKEND_URL}/api/generate-criteria`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify(body),

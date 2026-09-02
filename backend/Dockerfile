@@ -23,4 +23,8 @@ RUN mkdir -p /app/models
 
 EXPOSE 8000
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Shell form so $PORT expands. Render assigns the port at runtime and the
+# container must bind to it; Fly and local runs have no PORT set and fall back
+# to 8000, which matches internal_port in fly.toml. Exec form with a literal
+# 8000 binds the wrong port on Render and the deploy fails its health check.
+CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}

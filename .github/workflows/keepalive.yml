@@ -1,18 +1,43 @@
 name: Keep backend warm
 
-# Pings the Fly.io backend on a schedule so a scale-to-zero machine is more
-# likely to be already awake when a visitor arrives. This REDUCES the ~30s
-# cold start; it does not eliminate it (GitHub cron is best-effort and can be
-# delayed under load). For a hard guarantee, set min_machines_running = 1 in
-# fly.toml instead (uses more always-on resources).
+# Pings the backend on a schedule so a sleeping free instance is more likely to
+# be awake when a visitor arrives. This REDUCES the cold start; it does not
+# remove it, because GitHub runs scheduled workflows on a best-effort basis and
+# routinely delays them by hours under load.
+#
+# This step used to end in `|| true`, so the job reported success whether or
+# not anything answered. The Fly deployment was suspended on 28 June and every
+# run since then was still green. A check that cannot fail is worse than no
+# check at all, because it is actively reassuring.
+#
+# It now fails when the backend does not answer. Alerting proper lives in
+# Balisa50.github.io/.github/workflows/uptime.yml, which opens an issue; this
+# one keeps the instance warm and goes red if that stops working.
 on:
   schedule:
-    - cron: "*/5 * * * *"
+    - cron: "*/15 * * * *"
   workflow_dispatch: {}
 
 jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping backend root
-        run: curl -fsS -m 30 https://nova-backend.fly.dev/ > /dev/null || true
+      - name: Ping backend health endpoint
+        env:
+          # Set BACKEND_URL as a repository variable once the service is
+          # redeployed. It falls back to the suspended Fly host so an unset
+          # variable fails loudly rather than silently pinging nothing.
+          BACKEND_URL: ${{ vars.BACKEND_URL || 'https://nova-backend.fly.dev' }}
+        run: |
+          # A sleeping free instance can take ~50s to wake, so allow 90 seconds
+          # and retry once before calling it down.
+          for attempt in 1 2; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 90 \
+                     "${BACKEND_URL}/api/health" 2>/dev/null) || true
+            [ -z "$code" ] && code="000"
+            echo "attempt ${attempt}: ${code}"
+            [ "$code" = "200" ] && exit 0
+            [ "$attempt" = "1" ] && sleep 15
+          done
+          echo "Backend did not answer 200 at ${BACKEND_URL}/api/health"
+          exit 1

@@ -1,22 +1,37 @@
 # Render blueprint for the NOVA FastAPI backend.
-# Deploy: push to GitHub, then "New + > Blueprint" on Render and point it here.
 #
-# Note on resources: PyTorch (CPU) + RandomForest validation on 10k rows needs
-# more than the 512 MB free tier offers comfortably. Use at least the Starter
-# plan, or set MAX_ROWS lower for the free tier.
+# Deploy: push to GitHub, then on Render choose New + > Blueprint and point it
+# at this repository.
+#
+# WHY DOCKER RATHER THAN runtime: python
+# requirements.txt pins torch==2.5.1, and installing that from PyPI pulls the
+# CUDA build, roughly 2.5GB of libraries this CPU-only service never uses. That
+# alone exceeds the free tier's build and image budget. The Dockerfile installs
+# CPU-only torch from download.pytorch.org first, so the rest of the file
+# resolves against a wheel that is already satisfied. Building through Docker
+# is what makes the free plan possible at all here.
+#
+# WHY MAX_ROWS IS 6000
+# The free instance has 512MB. This service ran on Fly with exactly that much
+# memory and exactly this cap until the Fly trial ended, so the number is
+# measured rather than hoped for. Raising it needs a larger instance.
+#
+# COLD STARTS
+# Free instances sleep after inactivity and take roughly 50 seconds to wake.
+# The frontend has to tolerate a slow first request rather than treat it as a
+# failure.
 services:
   - type: web
     name: nova-backend
-    runtime: python
-    plan: starter
+    runtime: docker
+    plan: free
     rootDir: backend
-    buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    dockerfilePath: ./Dockerfile
     healthCheckPath: /api/health
     envVars:
-      - key: PYTHON_VERSION
-        value: "3.12.6"
+      # Tighten to the Vercel origin once the URL is settled. Left open here so
+      # the first deploy is not blocked by a CORS mismatch.
       - key: CORS_ORIGINS
-        value: "*"          # tighten to your Vercel domain in production
+        value: "*"
       - key: MAX_ROWS
-        value: "20000"
+        value: "6000"

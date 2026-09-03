@@ -1,6 +1,9 @@
 <!-- markdownlint-disable MD013 MD033 -->
 # NOVA
 
+[![CI](https://github.com/Balisa50/nova/actions/workflows/ci.yml/badge.svg)](https://github.com/Balisa50/nova/actions/workflows/ci.yml)
+[![Licence: MIT](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
+
 **A universal synthetic-data engine for finance - with two modes - served through a FastAPI + Next.js web app.**
 
 - **Create** *(from nothing)* - define columns, distributions and **domain rules**, and NOVA generates brand-new, realistic data **with no source dataset**. Ships with presets for seven financial domains (banking, payments/fraud, insurance, remittances, macro, wealth, corporate) - or define your own. This is the answer to data scarcity in understudied regions: anyone with domain knowledge can make the data they need.
@@ -14,14 +17,15 @@
 1. [What's inside](#whats-inside)
 2. [Architecture](#architecture)
 3. [Quickstart](#quickstart)
-4. [The dataset](#the-dataset)
-5. [The CTGAN](#the-ctgan)
-6. [Validation](#validation)
-7. [API](#api)
-8. [Web app](#web-app)
-9. [Deployment](#deployment)
-10. [Design decisions & honesty notes](#design-decisions--honesty-notes)
-11. [License](#license)
+4. [Tests](#tests)
+5. [The dataset](#the-dataset)
+6. [The CTGAN](#the-ctgan)
+7. [Validation](#validation)
+8. [API](#api)
+9. [Web app](#web-app)
+10. [Deployment](#deployment)
+11. [Design decisions & honesty notes](#design-decisions--honesty-notes)
+12. [Licence](#licence)
 
 ---
 
@@ -58,6 +62,10 @@ nova/
 
 ## Quickstart
 
+If you have GNU make, `make setup` installs both halves, `make test` runs the
+suite and `make lint` runs ruff and eslint. `make help` lists the targets. The
+long form, step by step:
+
 ```bash
 # 1. Backend env
 cd backend
@@ -85,6 +93,20 @@ npm install
 echo "NEXT_PUBLIC_BACKEND_URL=http://127.0.0.1:8000" > .env.local
 npm run dev
 ```
+
+## Tests
+
+```bash
+cd backend
+pip install pytest ruff==0.14.10
+pytest -q          # CTGAN smoke tests: trains, samples, stays in domain, reproduces under a seed
+ruff check . --config ruff.toml
+```
+
+GitHub Actions runs the same two checks plus an eslint and production build of
+the frontend on every push and pull request. `.pre-commit-config.yaml` wires
+ruff, a private-key scan and a large-file guard into `git commit`; enable it
+with `pip install pre-commit && pre-commit install`.
 
 ## The dataset
 
@@ -158,7 +180,7 @@ Next.js 16 (App Router) + TypeScript + Tailwind. A **Create / Copy** mode toggle
 ## Deployment
 
 - **Frontend → Vercel.** Set `NEXT_PUBLIC_BACKEND_URL` (and `BACKEND_URL`) to the backend URL.
-- **Backend → Fly.io** via `backend/fly.toml` + `backend/Dockerfile` (CPU-only torch; numpy 2.x / scikit-learn 1.7.2 pinned so the checkpoint loads). `render.yaml` is kept as an alternative. PyTorch + RandomForest validation wants >512 MB for heavy `/generate`; bump the VM or lower `MAX_ROWS`. (Create mode is light and runs comfortably in 512 MB.)
+- **Backend → Render** via `render.yaml` (`backend/Dockerfile`, CPU-only torch, numpy 2.x / scikit-learn 1.7.2 pinned so the checkpoint loads). The Fly deployment in `backend/fly.toml` is kept for reference; its trial ended and the host no longer answers. `.github/workflows/keepalive.yml` pings `vars.BACKEND_URL` and goes red when the backend is down, which is what it is currently reporting. + `backend/Dockerfile` (CPU-only torch; numpy 2.x / scikit-learn 1.7.2 pinned so the checkpoint loads). `render.yaml` is kept as an alternative. PyTorch + RandomForest validation wants >512 MB for heavy `/generate`; bump the VM or lower `MAX_ROWS`. (Create mode is light and runs comfortably in 512 MB.)
 
 ## Design decisions & honesty notes
 
@@ -167,6 +189,6 @@ Next.js 16 (App Router) + TypeScript + Tailwind. A **Create / Copy** mode toggle
 - **Generator width.** The canonical CTGAN (256×256 residual blocks) is used rather than the prompt's 256→512→1024 tower - it is both more faithful to the paper and ~5× faster on CPU with no measurable quality loss at this scale.
 - **CTGAN does not enforce hard arithmetic identities.** `loan_amount_local` correlates strongly with `usd × fx` but is not exactly equal, because the model learns a joint distribution rather than a deterministic rule - expected GAN behaviour.
 
-## License
+## Licence
 
-MIT.
+MIT. See [LICENSE](LICENSE). All data in this repository is synthetic.

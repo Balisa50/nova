@@ -18,7 +18,6 @@ Every metric returns a dict with a numeric score and a boolean `pass`, and
 
 from __future__ import annotations
 
-from typing import Optional
 
 import numpy as np
 import pandas as pd

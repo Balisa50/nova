@@ -50,7 +50,7 @@ class DataSampler:
         spans = transformer.discrete_column_spans          # [(start, length)]
         self._n_discrete = len(spans)
         self._span_start = np.array([s for s, _ in spans], dtype=int)
-        self._span_len = np.array([l for _, l in spans], dtype=int)
+        self._span_len = np.array([length for _, length in spans], dtype=int)
         self.cond_dim = int(self._span_len.sum())
 
         # Row ids per (discrete column, category) for conditioned real sampling.
@@ -358,11 +358,11 @@ class CTGAN:
         fakez = torch.normal(mean=mean, std=std)
         condvec = self.sampler.sample_condvec(self.batch_size)
         if condvec is None:
-            cond, mask = None, None
+            cond = None
         else:
             c, m, _, _ = condvec
             cond = torch.from_numpy(c).to(self.device)
-            mask = torch.from_numpy(m).to(self.device)
+            # m (the cond mask) is only needed by _cond_loss during training.
 
         fake = self._apply_activate(self.generator(fakez, cond))
         fake_cat = fake if cond is None else torch.cat([fake, cond], dim=1)
@@ -507,7 +507,7 @@ class CTGAN:
         model.loss_history = ckpt.get("loss_history", [])
         data_dim = model.transformer.output_dimensions
         spans = model.transformer.discrete_column_spans
-        cond_dim = int(sum(l for _, l in spans))
+        cond_dim = int(sum(length for _, length in spans))
         # Rebuild a sampler is only needed for conditional generation; reconstruct
         # it lazily from the transformer's discrete layout (frequencies are not
         # persisted, so sampling uses uniform cond if no data is re-supplied).

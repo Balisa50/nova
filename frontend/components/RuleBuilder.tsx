@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
+import { useSyncExternalStore, type CSSProperties, type ReactNode } from "react";
 import {
   DndContext,
   KeyboardSensor,
@@ -54,6 +54,12 @@ function reorderRules(items: Item[], activeId: string, overId: string): Item[] {
   return items.map((it) => (it.kind === "rule" ? moved[k++] : it));
 }
 
+// Mount gate. The store never changes, so the subscriber is a stable no-op and
+// the two snapshots differ only by environment: false on the server, true on the
+// client. This is the hydration-safe way to say "after mount" without calling
+// setState inside an effect.
+const subscribeToNothing = () => () => {};
+
 export function RuleBuilder({
   items,
   setItems,
@@ -68,8 +74,11 @@ export function RuleBuilder({
   // dnd-kit assigns global ids that drift between SSR and the client, so we
   // only enable drag-and-drop after mount. Server + first paint show static
   // handles, which keeps hydration clean.
-  const [dnd, setDnd] = useState(false);
-  useEffect(() => setDnd(true), []);
+  const dnd = useSyncExternalStore(
+    subscribeToNothing,
+    () => true,   // client
+    () => false   // server + first paint
+  );
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),

@@ -156,10 +156,10 @@ Faithful to Xu et al. (2019), *Modeling Tabular Data using Conditional GAN*:
 
 | Metric | Method | Pass threshold | Result |
 |---|---|---|---|
-| Statistical similarity | Mean column-shape similarity (1 − KS statistic / 1 − TVD) | ≥ 0.90 | **0.943** ✅ |
-| Correlation preservation | L1 mean \|corr_real − corr_synth\| | < 0.10 | **0.051** ✅ |
-| TSTR utility | RandomForest trained on synthetic, tested on real | accuracy ratio ≥ 0.90 | **0.92** (AUC ratio **0.94**) ✅ |
-| Privacy (DCR) | Distance to closest record vs a real holdout | ratio ≥ 0.90, duplicates ≤ 5% | **1.10**, **1.1%** ✅ |
+| Statistical similarity | Mean column-shape similarity (1 − KS statistic / 1 − TVD) | ≥ 0.90 | **0.943** |
+| Correlation preservation | L1 mean \|corr_real − corr_synth\| | < 0.10 | **0.051** |
+| TSTR utility | RandomForest trained on synthetic, tested on real | accuracy ratio ≥ 0.90 | **0.92** (AUC ratio **0.94**) |
+| Privacy (DCR) | Distance to closest record vs a real holdout | ratio ≥ 0.90, duplicates ≤ 5% | **1.10**, **1.1%** |
 
 **All four metrics pass** (model: 100 epochs, early-stopped; best validation KS 0.11). Full results in `backend/models/validation_report.json`; re-generate with `python -m scripts.validate`.
 

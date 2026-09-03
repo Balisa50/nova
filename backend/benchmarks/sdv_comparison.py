@@ -56,10 +56,45 @@ SEED = 0
 OUT = Path(__file__).resolve().parent / "results.json"
 
 
-def load(name: str):
-    from sdv.datasets.demo import download_demo
+CACHE = Path(__file__).resolve().parent / ".data"
 
-    data, meta = download_demo(modality="single_table", dataset_name=name)
+
+def load(name: str, attempts: int = 4):
+    """Fetch a demo dataset, caching it so a re-run needs no network.
+
+    The first run of this hit a read timeout part-way through downloading from
+    S3 and lost the datasets it had already fetched. A benchmark that cannot be
+    re-run without the network is not reproducible, so each dataset is written
+    to .data on first fetch and read from there afterwards.
+    """
+    from sdv.datasets.demo import download_demo
+    from sdv.metadata import Metadata
+
+    CACHE.mkdir(exist_ok=True)
+    csv_path = CACHE / f"{name}.csv"
+    meta_path = CACHE / f"{name}.meta.json"
+
+    if csv_path.exists() and meta_path.exists():
+        data = pd.read_csv(csv_path)
+        meta = Metadata.load_from_json(meta_path)
+    else:
+        last = None
+        for attempt in range(attempts):
+            try:
+                data, meta = download_demo(modality="single_table", dataset_name=name)
+                break
+            except Exception as e:  # noqa: BLE001 - any transport failure is retryable
+                last = e
+                print(f"  download attempt {attempt + 1} failed: {str(e)[:90]}", flush=True)
+                time.sleep(5 * (attempt + 1))
+        else:
+            raise RuntimeError(f"could not download {name} after {attempts} attempts: {last}")
+
+        data.to_csv(csv_path, index=False)
+        if meta_path.exists():
+            meta_path.unlink()
+        meta.save_to_json(meta_path)
+
     if len(data) > SUBSAMPLE:
         data = data.sample(SUBSAMPLE, random_state=SEED).reset_index(drop=True)
     return data, meta
@@ -197,15 +232,23 @@ def run_one(name: str) -> dict:
 
 def main() -> None:
     print(f"epochs={EPOCHS} subsample={SUBSAMPLE} batch={BATCH_SIZE} pac={PAC} seed={SEED}")
-    results = [run_one(name) for name in DATASETS]
 
-    payload = {
-        "config": {"epochs": EPOCHS, "subsample": SUBSAMPLE, "batch_size": BATCH_SIZE,
-                   "pac": PAC, "seed": SEED, "split": "70% train"},
-        "results": results,
-    }
-    OUT.write_text(json.dumps(payload, indent=2), encoding="utf-8")
-    print(f"\nwrote {OUT}")
+    config = {"epochs": EPOCHS, "subsample": SUBSAMPLE, "batch_size": BATCH_SIZE,
+              "pac": PAC, "seed": SEED, "split": "70% train"}
+    results: list[dict] = []
+
+    # Written after every dataset rather than only at the end. The widest
+    # dataset here is slow on CPU, and a run that dies on the third should not
+    # throw away the first two.
+    for name in DATASETS:
+        results.append(run_one(name))
+        OUT.write_text(
+            json.dumps({"config": config, "results": results}, indent=2),
+            encoding="utf-8",
+        )
+        print(f"  -> results.json holds {len(results)} of {len(DATASETS)}", flush=True)
+
+    print("wrote " + str(OUT))
 
 
 if __name__ == "__main__":

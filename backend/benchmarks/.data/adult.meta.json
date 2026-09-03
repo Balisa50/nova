@@ -1,0 +1,61 @@
+{
+    "tables": {
+        "adult": {
+            "columns": {
+                "age": {
+                    "sdtype": "numerical",
+                    "computer_representation": "Int64"
+                },
+                "workclass": {
+                    "sdtype": "categorical"
+                },
+                "fnlwgt": {
+                    "sdtype": "numerical",
+                    "computer_representation": "Int64"
+                },
+                "education": {
+                    "sdtype": "categorical"
+                },
+                "education-num": {
+                    "sdtype": "numerical",
+                    "computer_representation": "Int64"
+                },
+                "marital-status": {
+                    "sdtype": "categorical"
+                },
+                "occupation": {
+                    "sdtype": "categorical"
+                },
+                "relationship": {
+                    "sdtype": "categorical"
+                },
+                "race": {
+                    "sdtype": "categorical"
+                },
+                "sex": {
+                    "sdtype": "categorical"
+                },
+                "capital-gain": {
+                    "sdtype": "numerical",
+                    "computer_representation": "Int64"
+                },
+                "capital-loss": {
+                    "sdtype": "numerical",
+                    "computer_representation": "Int64"
+                },
+                "hours-per-week": {
+                    "sdtype": "numerical",
+                    "computer_representation": "Int64"
+                },
+                "native-country": {
+                    "sdtype": "categorical"
+                },
+                "label": {
+                    "sdtype": "categorical"
+                }
+            }
+        }
+    },
+    "relationships": [],
+    "METADATA_SPEC_VERSION": "V1"
+}

@@ -39,3 +39,6 @@ Thumbs.db
 # Python build artefacts
 dist/
 build/
+
+# Benchmark dataset cache
+benchmarks/.data/

@@ -1,0 +1,91 @@
+{
+    "tables": {
+        "insurance": {
+            "columns": {
+                "GoodStudent": {
+                    "sdtype": "boolean"
+                },
+                "Age": {
+                    "sdtype": "categorical"
+                },
+                "SocioEcon": {
+                    "sdtype": "categorical"
+                },
+                "RiskAversion": {
+                    "sdtype": "categorical"
+                },
+                "VehicleYear": {
+                    "sdtype": "categorical"
+                },
+                "ThisCarDam": {
+                    "sdtype": "categorical"
+                },
+                "RuggedAuto": {
+                    "sdtype": "categorical"
+                },
+                "Accident": {
+                    "sdtype": "categorical"
+                },
+                "MakeModel": {
+                    "sdtype": "categorical"
+                },
+                "DrivQuality": {
+                    "sdtype": "categorical"
+                },
+                "Mileage": {
+                    "sdtype": "categorical"
+                },
+                "Antilock": {
+                    "sdtype": "boolean"
+                },
+                "DrivingSkill": {
+                    "sdtype": "categorical"
+                },
+                "SeniorTrain": {
+                    "sdtype": "boolean"
+                },
+                "ThisCarCost": {
+                    "sdtype": "categorical"
+                },
+                "Theft": {
+                    "sdtype": "boolean"
+                },
+                "CarValue": {
+                    "sdtype": "categorical"
+                },
+                "HomeBase": {
+                    "sdtype": "categorical"
+                },
+                "AntiTheft": {
+                    "sdtype": "boolean"
+                },
+                "PropCost": {
+                    "sdtype": "categorical"
+                },
+                "OtherCarCost": {
+                    "sdtype": "categorical"
+                },
+                "OtherCar": {
+                    "sdtype": "boolean"
+                },
+                "MedCost": {
+                    "sdtype": "categorical"
+                },
+                "Cushioning": {
+                    "sdtype": "categorical"
+                },
+                "Airbag": {
+                    "sdtype": "boolean"
+                },
+                "ILiCost": {
+                    "sdtype": "categorical"
+                },
+                "DrivHist": {
+                    "sdtype": "categorical"
+                }
+            }
+        }
+    },
+    "relationships": [],
+    "METADATA_SPEC_VERSION": "V1"
+}

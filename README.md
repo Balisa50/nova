@@ -21,12 +21,13 @@
 5. [Tests](#tests)
 6. [The dataset](#the-dataset)
 7. [The CTGAN](#the-ctgan)
-8. [Validation](#validation)
-9. [API](#api)
-10. [Web app](#web-app)
-11. [Deployment](#deployment)
-12. [Design decisions & honesty notes](#design-decisions--honesty-notes)
-13. [Licence](#licence)
+8. [Benchmark against SDV](#benchmark-against-sdv)
+9. [Validation](#validation)
+10. [API](#api)
+11. [Web app](#web-app)
+12. [Deployment](#deployment)
+13. [Design decisions & honesty notes](#design-decisions--honesty-notes)
+14. [Licence](#licence)
 
 ---
 
@@ -149,6 +150,28 @@ Faithful to Xu et al. (2019), *Modeling Tabular Data using Conditional GAN*:
 | Critic | PacGAN packing + LeakyReLU/Dropout, **WGAN-GP** gradient penalty |
 | Training-by-sampling | Log-frequency category sampling so rare classes (defaulters) don't collapse |
 | Early stopping | Best checkpoint by mean KS fidelity on a held-aside real subsample |
+
+## Benchmark against SDV
+
+Checked against SDV 1.38.2's `CTGANSynthesizer` on three of SDV's own demo
+datasets, with identical data, split, hyperparameters and seed, and scored by
+**SDV's own sdmetrics quality report** so the referee is not this project's code.
+
+| Dataset | this CTGAN | SDV CTGAN |
+|---|---|---|
+| adult | **0.821** | 0.790 |
+| news | **0.785** | 0.763 |
+| insurance | **0.877** | 0.822 |
+
+It edges the reference on all three, and the gain is concentrated in marginal
+distributions rather than pairwise structure. It also loses in three places
+worth knowing about: a narrower nearest-neighbour privacy margin on every
+dataset, clearly worse train-on-synthetic utility on `adult` (0.59 against
+0.71), and no speed advantage once past a startup-cost pilot.
+
+Full numbers, losses and limitations, including that this is 3,000 rows at 100
+epochs on one seed: [backend/benchmarks/BENCHMARK.md](backend/benchmarks/BENCHMARK.md).
+Reproduce with `python -m benchmarks.sdv_comparison`.
 
 ## Validation
 

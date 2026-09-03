@@ -97,10 +97,13 @@ the one the training data happened to have.
   detects memorisation; it does not prevent it and carries no formal
   guarantee. Do not present output from this as anonymised under a
   regulation that means something specific by the word.
-- **Not benchmarked against SDV yet.** It is an implementation of the
-  paper that passes its own validation suite. A comparison against the
-  reference implementation on public datasets is the next piece of work,
-  and until it exists you should treat quality claims as unproven.
+- **Benchmarked against SDV, with mixed results.** On SDV's own quality
+  scorer it edges the reference implementation on all three public
+  datasets tested (0.821/0.785/0.877 against 0.790/0.763/0.822). It gives
+  up ground to do it: nearest-neighbour privacy margin is narrower on all
+  three, downstream utility on `adult` is clearly worse (0.59 against
+  0.71), and it is not faster. See [benchmarks/BENCHMARK.md](benchmarks/BENCHMARK.md)
+  for the numbers, the losses and the limitations.
 - **Not a drop-in for arithmetic identities.** CTGAN learns a joint
   distribution, so a derived column like `local = usd * fx` comes out
   strongly correlated but not exactly equal. Enforce hard identities

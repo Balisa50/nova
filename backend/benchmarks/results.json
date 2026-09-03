@@ -1,0 +1,135 @@
+{
+  "config": {
+    "epochs": 100,
+    "subsample": 3000,
+    "batch_size": 500,
+    "pac": 10,
+    "seed": 0,
+    "split": "70% train"
+  },
+  "results": [
+    {
+      "dataset": "adult",
+      "rows": 3000,
+      "cols": 15,
+      "discrete": 10,
+      "train_rows": 2100,
+      "nova": {
+        "fit_seconds": 94.4,
+        "sample_seconds": 0.12,
+        "sdmetrics": {
+          "overall": 0.8207500000000001,
+          "Column Shapes": 0.8882857142857143,
+          "Column Pair Trends": 0.7532142857142858
+        },
+        "nova_metrics": {
+          "fidelity": 0.8873015873015873,
+          "correlation_l1": 0.08273589145670673,
+          "utility_auc_ratio": 0.5919841338007825,
+          "privacy_dcr_ratio": 1.6051265143832667,
+          "privacy_duplicate_share": 0.0019047619047619048,
+          "detection_accuracy": 0.9523809523809523
+        }
+      },
+      "sdv": {
+        "fit_seconds": 135.6,
+        "sample_seconds": 0.4,
+        "sdmetrics": {
+          "overall": 0.7900833333333334,
+          "Column Shapes": 0.8510793650793651,
+          "Column Pair Trends": 0.7290873015873016
+        },
+        "nova_metrics": {
+          "fidelity": 0.8452380952380952,
+          "correlation_l1": 0.07941602039965735,
+          "utility_auc_ratio": 0.7053275136447752,
+          "privacy_dcr_ratio": 1.8849981177817785,
+          "privacy_duplicate_share": 0.0009523809523809524,
+          "detection_accuracy": 0.9507936507936507
+        }
+      }
+    },
+    {
+      "dataset": "news",
+      "rows": 3000,
+      "cols": 59,
+      "discrete": 43,
+      "train_rows": 2100,
+      "nova": {
+        "fit_seconds": 137.4,
+        "sample_seconds": 0.27,
+        "sdmetrics": {
+          "overall": 0.7845263058112361,
+          "Column Shapes": 0.9358837772397095,
+          "Column Pair Trends": 0.6331688343827626
+        },
+        "nova_metrics": {
+          "fidelity": 0.9133549783549785,
+          "correlation_l1": 0.06253718348542091,
+          "utility_auc_ratio": null,
+          "privacy_dcr_ratio": 1.2184180049918036,
+          "privacy_duplicate_share": 0.002857142857142857,
+          "detection_accuracy": 0.9809523809523809
+        }
+      },
+      "sdv": {
+        "fit_seconds": 121.0,
+        "sample_seconds": 1.18,
+        "sdmetrics": {
+          "overall": 0.7631517601564362,
+          "Column Shapes": 0.8892332526230831,
+          "Column Pair Trends": 0.6370702676897891
+        },
+        "nova_metrics": {
+          "fidelity": 0.838452380952381,
+          "correlation_l1": 0.06479007115986546,
+          "utility_auc_ratio": null,
+          "privacy_dcr_ratio": 1.7387836363112639,
+          "privacy_duplicate_share": 0.0004761904761904762,
+          "detection_accuracy": 0.9936507936507937
+        }
+      }
+    },
+    {
+      "dataset": "insurance",
+      "rows": 3000,
+      "cols": 27,
+      "discrete": 27,
+      "train_rows": 2100,
+      "nova": {
+        "fit_seconds": 87.9,
+        "sample_seconds": 0.14,
+        "sdmetrics": {
+          "overall": 0.8774891950456232,
+          "Column Shapes": 0.9718629744334577,
+          "Column Pair Trends": 0.7831154156577885
+        },
+        "nova_metrics": {
+          "fidelity": 0.973021978021978,
+          "correlation_l1": 0.1278154140480918,
+          "utility_auc_ratio": null,
+          "privacy_dcr_ratio": 1.4857857440723485,
+          "privacy_duplicate_share": 0.0,
+          "detection_accuracy": 0.9714285714285714
+        }
+      },
+      "sdv": {
+        "fit_seconds": 77.7,
+        "sample_seconds": 0.28,
+        "sdmetrics": {
+          "overall": 0.8220925116149942,
+          "Column Shapes": 0.9212068149975429,
+          "Column Pair Trends": 0.7229782082324456
+        },
+        "nova_metrics": {
+          "fidelity": 0.9119780219780219,
+          "correlation_l1": 0.12573139834354433,
+          "utility_auc_ratio": null,
+          "privacy_dcr_ratio": 1.6638008836768718,
+          "privacy_duplicate_share": 0.0,
+          "detection_accuracy": 0.9634920634920635
+        }
+      }
+    }
+  ]
+}

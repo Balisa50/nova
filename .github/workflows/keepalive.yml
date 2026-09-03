@@ -13,6 +13,17 @@ name: Keep backend warm
 # It now fails when the backend does not answer. Alerting proper lives in
 # Balisa50.github.io/.github/workflows/uptime.yml, which opens an issue; this
 # one keeps the instance warm and goes red if that stops working.
+#
+# DISABLED as of 3 Sep 2026. There is currently no backend to warm: the Fly
+# trial ended and the Render service is not running, so nova-backend answers
+# nothing on either host. A warmer pointed at nothing is noise every fifteen
+# minutes, not a signal. Re-enable it after redeploying:
+#
+#   gh variable set BACKEND_URL --repo Balisa50/nova --body "https://<service>.onrender.com"
+#   gh workflow enable "Keep backend warm" --repo Balisa50/nova
+#
+# It is disabled rather than deleted, and it is deliberately still a check
+# that can fail, which is the property that was fixed in June.
 on:
   schedule:
     - cron: "*/15 * * * *"

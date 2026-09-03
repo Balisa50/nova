@@ -17,8 +17,8 @@ import time
 import warnings
 
 import pandas as pd
-from sklearn.model_selection import train_test_split
 from sklearn.exceptions import ConvergenceWarning
+from sklearn.model_selection import train_test_split
 
 warnings.filterwarnings("ignore", category=ConvergenceWarning)
 
@@ -29,7 +29,7 @@ except Exception:
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from synthfin.ctgan import CTGAN          # noqa: E402
+from synthfin.ctgan import CTGAN  # noqa: E402
 from synthfin.schema import detect_schema  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

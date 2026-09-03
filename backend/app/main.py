@@ -26,7 +26,6 @@ from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, PlainTextResponse
 from pydantic import BaseModel
-
 from synthfin.criteria import CriteriaError, generate_from_criteria, validate_spec
 from synthfin.presets import get_preset, list_presets
 
@@ -127,16 +126,16 @@ async def generate(
         except HTTPException:
             raise
         except Exception as exc:
-            raise HTTPException(400, f"Could not parse file: {exc}")
+            raise HTTPException(400, f"Could not parse file: {exc}") from exc
         if real_df is None or real_df.empty:
             raise HTTPException(400, "Uploaded file has no rows.")
 
     try:
         return service.generate(real_df, num_rows=num_rows, default_rate=default_rate)
     except ValueError as exc:
-        raise HTTPException(422, str(exc))
+        raise HTTPException(422, str(exc)) from exc
     except Exception as exc:  # noqa: BLE001
-        raise HTTPException(500, f"Generation failed: {exc}")
+        raise HTTPException(500, f"Generation failed: {exc}") from exc
 
 
 # --------------------------------------------------------------------------- #
@@ -175,9 +174,9 @@ def generate_criteria(req: CriteriaRequest):
     try:
         df, report = generate_from_criteria(spec, n_rows=n, seed=req.seed)
     except CriteriaError as exc:
-        raise HTTPException(422, str(exc))
+        raise HTTPException(422, str(exc)) from exc
     except Exception as exc:  # noqa: BLE001
-        raise HTTPException(500, f"Criteria generation failed: {exc}")
+        raise HTTPException(500, f"Criteria generation failed: {exc}") from exc
 
     return {
         "mode": "create",

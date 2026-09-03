@@ -25,9 +25,9 @@ except Exception:
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from synthfin.constraints import enforce_loan_constraints  # noqa: E402
-from synthfin.ctgan import CTGAN              # noqa: E402
-from synthfin.schema import detect_schema      # noqa: E402
-from synthfin.validation import validate_all, print_report  # noqa: E402
+from synthfin.ctgan import CTGAN  # noqa: E402
+from synthfin.schema import detect_schema  # noqa: E402
+from synthfin.validation import print_report, validate_all  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CSV = os.path.join(ROOT, "data", "west_african_loans.csv")

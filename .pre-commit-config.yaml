@@ -1,5 +1,8 @@
 # Install once:  pip install pre-commit && pre-commit install
 # Run on demand: pre-commit run --all-files
+#
+# ruff is pinned to the same version the CI job installs. If they drift, a
+# commit that passes locally can still fail CI on a rule that changed default.
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
@@ -8,22 +11,22 @@ repos:
       - id: end-of-file-fixer
       - id: check-yaml
       - id: check-json
+      - id: check-toml
       - id: check-added-large-files
         args: ["--maxkb=2048"]
       - id: check-merge-conflict
       - id: detect-private-key
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.8.4
+    rev: v0.14.10
     hooks:
-      - id: ruff
-        args: ["--fix"]
+      - id: ruff-check
+        args: ["--config", "backend/ruff.toml", "--fix"]
         files: ^backend/
       - id: ruff-format
+        args: ["--config", "backend/ruff.toml"]
         files: ^backend/
 
-  - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v3.1.0
-    hooks:
-      - id: prettier
-        files: ^frontend/.*\.(ts|tsx|js|jsx|json|css|md)$
+# The frontend is linted by eslint in CI (`npm run lint`). It is not wired in
+# here because a Node hook adds several seconds to every commit for a check
+# that already gates the pull request.

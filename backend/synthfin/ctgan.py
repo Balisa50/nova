@@ -435,7 +435,7 @@ class CTGAN:
     @torch.no_grad()
     def sample(self, n: int, seed: int | None = None,
                condition_column: str | None = None,
-               condition_value_probs: dict | None = None) -> "object":
+               condition_value_probs: dict | None = None) -> object:
         """Generate `n` synthetic rows.
 
         If `condition_column` is given (e.g. 'default'), every row is generated
@@ -498,7 +498,7 @@ class CTGAN:
         }, path)
 
     @classmethod
-    def load(cls, path: str, device: str | None = None) -> "CTGAN":
+    def load(cls, path: str, device: str | None = None) -> CTGAN:
         ckpt = torch.load(path, weights_only=False, map_location=device or "cpu")
         model = cls(device=device, verbose=False, **ckpt["config"])
         model.transformer = ckpt["transformer"]

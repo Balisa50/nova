@@ -1,0 +1,26 @@
+# Explicit rule selection. Relying on ruff's defaults means the lint result
+# changes when ruff releases, which makes CI fail on commits that did not
+# touch the code. The CI job pins the ruff version to match this file.
+
+line-length = 100
+target-version = "py312"
+
+[lint]
+select = [
+    "E",   # pycodestyle errors
+    "F",   # pyflakes
+    "I",   # import sorting
+    "W",   # pycodestyle warnings
+    "UP",  # pyupgrade
+    "B",   # bugbear
+]
+ignore = [
+    "E501",  # line length is enforced by the formatter, not the linter
+    "B008",  # FastAPI's Depends() in defaults is the documented pattern
+]
+
+[lint.per-file-ignores]
+"scripts/*" = ["E402"]  # one-off scripts set sys.path before importing
+
+[format]
+quote-style = "double"

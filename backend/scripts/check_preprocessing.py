@@ -28,8 +28,8 @@ except Exception:
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from synthfin.preprocessing import DataTransformer   # noqa: E402
-from synthfin.schema import detect_schema             # noqa: E402
+from synthfin.preprocessing import DataTransformer  # noqa: E402
+from synthfin.schema import detect_schema  # noqa: E402
 
 CSV = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                    "data", "west_african_loans.csv")

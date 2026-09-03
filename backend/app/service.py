@@ -15,7 +15,6 @@ import os
 import time
 
 import pandas as pd
-
 from synthfin.constraints import enforce_loan_constraints
 from synthfin.ctgan import CTGAN
 from synthfin.schema import detect_schema

@@ -23,7 +23,6 @@ schema. The transformer works on *any* CSV, not just the ground-truth set.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import List
 
 import numpy as np
 import pandas as pd
@@ -45,7 +44,7 @@ class ColumnTransformInfo:
     column_name: str
     column_type: str               # 'continuous' or 'discrete'
     output_dimensions: int
-    output_info: List[SpanInfo]
+    output_info: list[SpanInfo]
     # continuous:
     gmm: object = None
     valid_modes: np.ndarray = None  # bool mask over GMM components
@@ -75,13 +74,13 @@ class DataTransformer:
         self.rng = np.random.default_rng(seed)
         self._seed = seed
 
-        self.columns: List[str] = []
-        self.discrete_columns: List[str] = []
-        self.column_transform_info: List[ColumnTransformInfo] = []
+        self.columns: list[str] = []
+        self.discrete_columns: list[str] = []
+        self.column_transform_info: list[ColumnTransformInfo] = []
         self.output_dimensions: int = 0
 
     # ----------------------------- fit --------------------------------- #
-    def fit(self, df: pd.DataFrame, discrete_columns: List[str]) -> "DataTransformer":
+    def fit(self, df: pd.DataFrame, discrete_columns: list[str]) -> DataTransformer:
         self.columns = list(df.columns)
         self.discrete_columns = list(discrete_columns)
         self.column_transform_info = []

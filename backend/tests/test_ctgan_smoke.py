@@ -9,7 +9,6 @@ suite in synthfin.validation.
 import numpy as np
 import pandas as pd
 import pytest
-
 from synthfin.ctgan import CTGAN
 
 

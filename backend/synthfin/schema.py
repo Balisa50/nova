@@ -15,8 +15,6 @@ and target. Rules deliberately match the project spec:
 
 from __future__ import annotations
 
-from typing import Optional
-
 import pandas as pd
 
 TARGET_KEYWORDS = ("default", "target", "label", "churn", "fraud", "is_default", "y")
@@ -45,7 +43,7 @@ def detect_schema(df: pd.DataFrame, cat_threshold: int = 20) -> dict:
     # Gaussian mixture, so the threshold is deliberately generous.
     """Return {'discrete', 'continuous', 'id_columns', 'target'} for a DataFrame."""
     id_columns, discrete, continuous = [], [], []
-    target: Optional[str] = None
+    target: str | None = None
 
     # Pick the target first (so it is forced discrete even if numeric-binary).
     # Match exact names or a `_keyword` suffix -- NOT a bare suffix, otherwise a

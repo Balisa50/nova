@@ -82,7 +82,7 @@ class _SafeEval(ast.NodeVisitor):
         try:
             tree = ast.parse(expr, mode="eval")
         except SyntaxError as e:
-            raise CriteriaError(f"Could not parse expression {expr!r}: {e}")
+            raise CriteriaError(f"Could not parse expression {expr!r}: {e}") from e
         return self.visit(tree.body)
 
     # --- disallow everything not explicitly handled --- #
@@ -129,7 +129,7 @@ class _SafeEval(ast.NodeVisitor):
     def visit_Compare(self, node):
         left = self.visit(node.left)
         result = None
-        for op, comparator in zip(node.ops, node.comparators):
+        for op, comparator in zip(node.ops, node.comparators, strict=True):
             right = self.visit(comparator)
             if isinstance(op, ast.In):
                 cur = np.isin(left, list(right))
@@ -250,7 +250,7 @@ def generate_from_criteria(spec: dict, n_rows: int = 10000, seed: int = 0) -> tu
                     else np.ones(n, dtype=bool))
             new = safe_eval(expr, env)
         except CriteriaError as e:
-            raise CriteriaError(f"Rule #{i} ({target}): {e}")
+            raise CriteriaError(f"Rule #{i} ({target}): {e}") from e
         new = np.asarray(new)
         if new.ndim == 0:
             new = np.full(n, new.item())

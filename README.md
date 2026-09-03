@@ -16,16 +16,17 @@
 ## Table of contents
 1. [What's inside](#whats-inside)
 2. [Architecture](#architecture)
-3. [Quickstart](#quickstart)
-4. [Tests](#tests)
-5. [The dataset](#the-dataset)
-6. [The CTGAN](#the-ctgan)
-7. [Validation](#validation)
-8. [API](#api)
-9. [Web app](#web-app)
-10. [Deployment](#deployment)
-11. [Design decisions & honesty notes](#design-decisions--honesty-notes)
-12. [Licence](#licence)
+3. [Use the model](#use-the-model)
+4. [Working on the repository](#working-on-the-repository)
+5. [Tests](#tests)
+6. [The dataset](#the-dataset)
+7. [The CTGAN](#the-ctgan)
+8. [Validation](#validation)
+9. [API](#api)
+10. [Web app](#web-app)
+11. [Deployment](#deployment)
+12. [Design decisions & honesty notes](#design-decisions--honesty-notes)
+13. [Licence](#licence)
 
 ---
 
@@ -60,7 +61,29 @@ nova/
               (mode-specific normalization)   (conditional generator)   (KS/Chi2 · corr · TSTR · MIA)
 ```
 
-## Quickstart
+## Use the model
+
+The model is packaged. If you only want synthetic data, you do not need this
+repository, the web app or a deployment:
+
+```bash
+pip install synthfin
+```
+
+```python
+import pandas as pd
+from synthfin import synthesize
+
+real = pd.read_csv("loans.csv")
+synth, report = synthesize(real, n_rows=5000)
+```
+
+Column types are detected, ID columns are dropped rather than modelled, and
+`report` carries the four validation metrics. `backend/README.md` is the
+package documentation, including the Create-mode criteria engine and how to
+drop down to `CTGAN` directly.
+
+## Working on the repository
 
 If you have GNU make, `make setup` installs both halves, `make test` runs the
 suite and `make lint` runs ruff and eslint. `make help` lists the targets. The

@@ -1,24 +1,32 @@
-"""Load the financial-domain criteria presets shipped in backend/presets/."""
+"""Load the financial-domain criteria presets shipped inside the package.
+
+These used to live at backend/presets, one directory above the package, and
+were resolved with a path built from __file__. That works from a source
+checkout and silently returns nothing from an installed wheel, because the
+directory is not part of the package at all. They now sit in
+synthfin/presets_data and are read through importlib.resources, which works
+the same from a checkout, a wheel, or a zipimport.
+"""
 
 from __future__ import annotations
 
-import glob
 import json
-import os
+from importlib import resources
 
-PRESETS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "presets")
+PRESETS_PACKAGE = "synthfin.presets_data"
 
 
 def load_presets() -> dict[str, dict]:
     """Return {preset_id: spec} for every JSON file in the presets directory."""
     presets: dict[str, dict] = {}
-    for path in sorted(glob.glob(os.path.join(PRESETS_DIR, "*.json"))):
+    for entry in sorted(resources.files(PRESETS_PACKAGE).iterdir(), key=lambda p: p.name):
+        if not entry.name.endswith(".json"):
+            continue
         try:
-            with open(path, encoding="utf-8") as f:
-                spec = json.load(f)
+            spec = json.loads(entry.read_text(encoding="utf-8"))
         except Exception:
             continue
-        pid = spec.get("id") or os.path.splitext(os.path.basename(path))[0]
+        pid = spec.get("id") or entry.name.removesuffix(".json")
         spec.setdefault("id", pid)
         presets[pid] = spec
     return presets

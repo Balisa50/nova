@@ -1,5 +1,5 @@
 """
-Define the 7 financial-domain criteria presets, write them to backend/presets/
+Define the 7 financial-domain criteria presets, write them to synthfin/presets_data/
 as JSON, and smoke-test each by generating a sample (validates every spec).
 
 Run (from backend/):  python -m scripts.build_presets
@@ -20,7 +20,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from synthfin.criteria import generate_from_criteria, validate_spec  # noqa: E402
 
-PRESETS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "presets")
+PRESETS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "synthfin", "presets_data")
 
 
 def C(name, type_, dist=None, **extra):

@@ -35,3 +35,7 @@ out/
 Thumbs.db
 .idea/
 .vscode/
+
+# Python build artefacts
+dist/
+build/

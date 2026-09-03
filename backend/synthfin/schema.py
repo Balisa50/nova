@@ -17,7 +17,13 @@ from __future__ import annotations
 
 import pandas as pd
 
-TARGET_KEYWORDS = ("default", "target", "label", "churn", "fraud", "is_default", "y")
+# Matching is exact-name or "_keyword" suffix (see below), never a bare
+# substring, so inflections have to be listed rather than inferred. A column
+# called `defaulted` is the most natural name in credit risk and was being
+# missed entirely, which silently skipped the utility metric.
+TARGET_KEYWORDS = ("default", "defaulted", "target", "label", "churn", "churned",
+                   "fraud", "fraudulent", "is_default", "is_churn", "is_fraud",
+                   "outcome", "y")
 ID_SUFFIXES = ("id", "uuid", "guid", "_id", "uid")
 
 

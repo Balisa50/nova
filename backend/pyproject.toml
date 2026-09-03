@@ -1,0 +1,53 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "synthfin"
+dynamic = ["version"]
+description = "A Conditional Tabular GAN built from scratch in PyTorch, with a four-metric validation suite."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [{ name = "Abdoulie Balisa" }]
+keywords = ["ctgan", "gan", "synthetic-data", "tabular-data", "pytorch", "privacy"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+# Deliberately narrower than requirements.txt, which also pins the FastAPI
+# service. Installing the model should not drag in a web server.
+#
+# numpy must stay 2.x and scikit-learn 1.7.x: a trained checkpoint pickles
+# numpy-2.x arrays and a scikit-learn 1.7 BayesianGaussianMixture, and older
+# versions fail to load it with "No module named 'numpy._core'".
+dependencies = [
+    "numpy>=2.1,<2.4",
+    "pandas>=2.2",
+    "scikit-learn>=1.7,<1.8",
+    "scipy>=1.14",
+    "torch>=2.5",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff==0.14.10"]
+
+[project.urls]
+Homepage = "https://nova-fin.vercel.app"
+Source = "https://github.com/Balisa50/nova"
+Issues = "https://github.com/Balisa50/nova/issues"
+
+[tool.hatch.version]
+path = "synthfin/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["synthfin"]
+
+[tool.hatch.build.targets.sdist]
+include = ["synthfin", "tests", "README.md", "LICENSE"]

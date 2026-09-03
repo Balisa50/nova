@@ -66,9 +66,19 @@ def test_categories_stay_inside_the_fitted_domain(run, loans):
         assert set(synth[col].unique()) <= set(loans[col].unique())
 
 
-def test_report_has_all_four_sections(run):
+def test_report_has_every_section(run):
     _, report = run
-    assert set(report) == {"fidelity", "correlation", "utility", "privacy"}
+    assert set(report) == {"fidelity", "correlation", "utility", "privacy", "detection"}
+
+
+def test_privacy_is_the_distance_test_not_the_detection_one(run):
+    # These answer different questions and were briefly conflated. Distance to
+    # closest record is the memorisation check; a detection classifier measures
+    # whether real and synthetic are distinguishable, which is fidelity. A model
+    # can look private by the second while having copied rows.
+    _, report = run
+    assert "median_dcr_ratio" in report["privacy"]
+    assert "attack_accuracy" in report["detection"]
 
 
 def test_utility_is_scored_when_a_target_is_detectable(run):
@@ -105,7 +115,7 @@ def test_detect_schema_does_not_swallow_lookalike_columns():
 def test_validate_can_be_called_on_its_own(loans, run):
     synth, _ = run
     report = validate(loans[synth.columns], synth)
-    assert set(report) == {"fidelity", "correlation", "utility", "privacy"}
+    assert set(report) == {"fidelity", "correlation", "utility", "privacy", "detection"}
 
 
 def test_presets_are_package_data_not_a_sibling_directory():

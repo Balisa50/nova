@@ -55,6 +55,7 @@ from synthfin.preprocessing import DataTransformer
 from synthfin.presets import get_preset, list_presets
 from synthfin.schema import detect_schema
 from synthfin.validation import (
+    run_dcr_privacy,
     run_privacy_assessment,
     run_statistical_tests,
     run_tstr_validation,
@@ -70,6 +71,7 @@ __all__ = [
     "generate_from_criteria",
     "get_preset",
     "list_presets",
+    "run_dcr_privacy",
     "run_privacy_assessment",
     "run_statistical_tests",
     "run_tstr_validation",

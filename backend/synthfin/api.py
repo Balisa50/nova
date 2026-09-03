@@ -14,6 +14,7 @@ import pandas as pd
 from synthfin.ctgan import CTGAN
 from synthfin.schema import detect_schema
 from synthfin.validation import (
+    run_dcr_privacy,
     run_privacy_assessment,
     run_statistical_tests,
     run_tstr_validation,
@@ -39,8 +40,12 @@ def validate(
       correlation  does the dependence structure survive
       utility      train on synthetic, test on real: does a model learned
                    from the synthetic data still work on the real thing
-      privacy      how close is the nearest synthetic row to a real one,
-                   which is the memorisation check
+      privacy      distance to the closest real record, against how close a
+                   fresh real holdout sits. This is the memorisation check
+      detection    whether a classifier can tell real from synthetic. Reported
+                   separately because it measures distinguishability, which is
+                   fidelity rather than privacy: a model that scores well here
+                   may still have copied rows
 
     Column lists are inferred with `detect_schema` when omitted. `target`
     likewise, and the utility section is skipped when there is no target
@@ -59,7 +64,12 @@ def validate(
         "correlation": test_correlation_preservation(
             real, synth, continuous, discrete
         ),
-        "privacy": run_privacy_assessment(
+        # Distance to closest record. The detection classifier below answers a
+        # different question and was previously reported in this slot, which
+        # overstated the privacy result: being hard to distinguish from real
+        # data is not evidence that no real row was memorised.
+        "privacy": run_dcr_privacy(real, synth, continuous, discrete, seed=seed),
+        "detection": run_privacy_assessment(
             real, synth, continuous, discrete, seed=seed
         ),
     }

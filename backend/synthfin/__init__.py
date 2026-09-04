@@ -30,13 +30,22 @@ distributions and rules and generate from the specification:
     df, report = generate_from_criteria({
         "n_rows": 1000,
         "columns": [
-            {"name": "age", "type": "int", "dist": "normal",
-             "mean": 34, "std": 9, "min": 18, "max": 70},
-            {"name": "region", "type": "category",
-             "values": ["urban", "rural"], "probs": [0.6, 0.4]},
+            {"name": "age", "type": "integer",
+             "dist": {"dist": "normal", "mu": 34, "sigma": 9},
+             "min": 18, "max": 70},
+            {"name": "region", "type": "categorical",
+             "dist": {"dist": "categorical",
+                      "values": ["urban", "rural"], "weights": [0.6, 0.4]}},
+            {"name": "senior", "type": "binary",
+             "dist": {"dist": "bernoulli", "p": 0.1}},
         ],
         "rules": [{"target": "senior", "expr": "age >= 60"}],
     })
+
+Every column a rule targets must be declared in `columns` first; the rule
+overwrites it rather than creating it. Check a spec before running it with
+`validate_spec`, which returns a list of problems and an empty list when
+there are none.
 
 Rule expressions run through a whitelist AST evaluator, never `eval`, so
 a specification arriving over an API cannot execute code.

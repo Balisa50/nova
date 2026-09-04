@@ -43,19 +43,32 @@ instead of reporting a number it did not compute.
 Declare columns, distributions and rules:
 
 ```python
-from synthfin import generate_from_criteria
+from synthfin import generate_from_criteria, validate_spec
 
-df, report = generate_from_criteria({
+spec = {
     "n_rows": 1000,
     "columns": [
-        {"name": "age", "type": "int", "dist": "normal",
-         "mean": 34, "std": 9, "min": 18, "max": 70},
-        {"name": "region", "type": "category",
-         "values": ["urban", "rural"], "probs": [0.6, 0.4]},
+        {"name": "age", "type": "integer",
+         "dist": {"dist": "normal", "mu": 34, "sigma": 9},
+         "min": 18, "max": 70},
+        {"name": "region", "type": "categorical",
+         "dist": {"dist": "categorical",
+                  "values": ["urban", "rural"], "weights": [0.6, 0.4]}},
+        {"name": "senior", "type": "binary",
+         "dist": {"dist": "bernoulli", "p": 0.1}},
     ],
     "rules": [{"target": "senior", "expr": "age >= 60"}],
-})
+}
+
+assert validate_spec(spec) == []          # returns a list of problems
+df, report = generate_from_criteria(spec)
 ```
+
+Column types are `integer`, `continuous`, `categorical`, `binary`, `count`
+and `id`. The distribution is a nested object naming its own parameters
+(`mu`/`sigma`, `shape`/`scale`, `p`, `lam`), with `min` and `max` on the
+column. Every column a rule targets must be declared first: a rule
+overwrites a column, it does not create one.
 
 Rule expressions go through a whitelist AST evaluator, never `eval`.
 Attribute access, arbitrary calls, subscripting and lambdas are all

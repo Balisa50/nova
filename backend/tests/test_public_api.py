@@ -141,3 +141,51 @@ def test_every_listed_preset_can_actually_be_fetched():
 
 def test_get_preset_returns_none_for_an_unknown_id():
     assert get_preset("no-such-preset") is None
+
+
+# --------------------------------------------------------------------------- #
+# The documented examples. These run the code exactly as the README prints it,
+# because a doc example that nothing executes is a doc example that rots. The
+# Create-mode one shipped wrong: "int" instead of "integer", a flat dist with
+# mean/std instead of a nested one with mu/sigma, and a rule targeting a column
+# that was never declared.
+# --------------------------------------------------------------------------- #
+
+CRITERIA_SPEC = {
+    "n_rows": 200,
+    "columns": [
+        {"name": "age", "type": "integer",
+         "dist": {"dist": "normal", "mu": 34, "sigma": 9},
+         "min": 18, "max": 70},
+        {"name": "region", "type": "categorical",
+         "dist": {"dist": "categorical",
+                  "values": ["urban", "rural"], "weights": [0.6, 0.4]}},
+        {"name": "senior", "type": "binary",
+         "dist": {"dist": "bernoulli", "p": 0.1}},
+    ],
+    "rules": [{"target": "senior", "expr": "age >= 60"}],
+}
+
+
+def test_documented_criteria_spec_validates():
+    from synthfin import validate_spec
+
+    assert validate_spec(CRITERIA_SPEC) == []
+
+
+def test_documented_criteria_example_runs_and_honours_its_rule():
+    from synthfin import generate_from_criteria
+
+    df, _ = generate_from_criteria(CRITERIA_SPEC, n_rows=200, seed=0)
+    assert len(df) == 200
+    assert list(df.columns) == ["age", "region", "senior"]
+    # the rule is the whole point: senior is derived, not sampled
+    assert ((df["age"] >= 60) == df["senior"].astype(bool)).all()
+
+
+def test_a_rule_targeting_an_undeclared_column_is_rejected():
+    from synthfin import CriteriaError, generate_from_criteria
+
+    spec = {**CRITERIA_SPEC, "columns": CRITERIA_SPEC["columns"][:2]}
+    with pytest.raises((CriteriaError, Exception)):
+        generate_from_criteria(spec, n_rows=50, seed=0)

@@ -12,9 +12,20 @@
 # is what makes the free plan possible at all here.
 #
 # WHY MAX_ROWS IS 6000
-# The free instance has 512MB. This service ran on Fly with exactly that much
-# memory and exactly this cap until the Fly trial ended, so the number is
-# measured rather than hoped for. Raising it needs a larger instance.
+# The free instance has 512MB. Measured on 2026-09-04 with
+# scripts/measure_memory.py, resident set size:
+#
+#   torch imported            197 MB
+#   + sklearn, pandas, scipy  292 MB
+#   + fastapi, uvicorn        306 MB
+#   model loaded, idle        334 MB
+#   peak during 1000 rows     388 MB
+#   peak during 3000 rows     400 MB
+#   peak during 6000 rows     446 MB   <- the cap, 66 MB under the limit
+#
+# So 6000 fits and is not a guess, but the margin is thin: torch alone is more
+# than half the budget before a single row is generated. Raising the cap needs
+# a larger instance, not a smaller batch.
 #
 # COLD STARTS
 # Free instances sleep after inactivity and take roughly 50 seconds to wake.
